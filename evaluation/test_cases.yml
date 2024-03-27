@@ -1,0 +1,12 @@
+# Test cases for the evaluation module. Not yet decided where
+# we'll go with this in terms of how to score this quantitively
+
+test_cases:
+  - question: "What is inflation"
+    answer: "Inflation is 2%"
+
+  - question: "What is GDP"
+    answer: "GDP stands for Gross Domestic Product"
+    
+  - question: "What is AI"
+    answer: "AI stands for Artificial Intelligence"

@@ -1,99 +1,37 @@
 # structured_rag
-
+Try and fix the knowledge management issues within MA and the Bank of England.
 ## Overview
+See the project initiation document if you're interested...
 
-This is your new Kedro project with Kedro-Viz setup, which was generated using `kedro 0.19.3`.
+## Next Steps
+1. Get a RAG working on a bunch of test data.
+2. Select the data to use for the demo.
+2. Build some test cases and evaluation criteria for the RAG system.
+3. Iteratively improve the system, checking against the evaluation criteria and test results.
 
-Take a look at the [Kedro documentation](https://docs.kedro.org) to get started.
+## Selecting the data to use
 
-## Rules and guidelines
+#### Considerations
+- Version 1: Only using external publications
+- Version 2: Using also internal publications (notes portal) - This would be much more useful.
 
-In order to get the best out of the template:
+At first instance, we're going to do Version 1 (external publications on webiste).
+- I could do MPR to MPR, but the external publications don't map so well to that.
+- Instead, I'm just going to do a full quarter.
+- The date to use could be `2023 March - June` (incl. the MPR)
 
-* Don't remove any lines from the `.gitignore` file we provide
-* Make sure your results can be reproduced by following a [data engineering convention](https://docs.kedro.org/en/stable/faq/faq.html#what-is-data-engineering-convention)
-* Don't commit data to your repository
-* Don't commit any credentials or your local configuration to your repository. Keep all your credentials and local configuration in `conf/local/`
+What about which content to use?
+| Type | Notes | Included? | N |
+| - | - | - | - |
+| Research Blog | Very rare - few of these exist on the website | ✅ | 0 |
+| Event | Typically don't have a lot of text or info to extract | ❌ | 14 |
+| Explainers | Rare form of content with custom formats | ❌ | 2 |
+| News | Can be easily converted to PDF. A lot of random content | ✅ | 48 |
+| Prudential Regulation | Lets include it as well | ✅ | 20 |
+| Publication | Yes | ✅ | 45 | 
+| Speech | Semantically rich | ✅ | 24 |
+| Statistics | Interesting to see how these are used | ✅ | 21 |
+| - | - | Total | 158 |
 
-## How to install dependencies
+Looking at the landscape of available content makes me think that I'll need to use the Notes portal.  I don't think there is enough overlap in a lot of the data from the external publications and it doesn't combine well. On the other hand, the Notes portal has a lot of overlapping content and much more metadata to create other structural links.
 
-Declare any dependencies in `requirements.txt` for `pip` installation.
-
-To install them, run:
-
-```
-pip install -r requirements.txt
-```
-
-## How to run your Kedro pipeline
-
-You can run your Kedro project with:
-
-```
-kedro run
-```
-
-## How to test your Kedro project
-
-Have a look at the files `src/tests/test_run.py` and `src/tests/pipelines/test_data_science.py` for instructions on how to write your tests. Run the tests as follows:
-
-```
-pytest
-```
-
-To configure the coverage threshold, look at the `.coveragerc` file.
-
-## Project dependencies
-
-To see and update the dependency requirements for your project use `requirements.txt`. Install the project requirements with `pip install -r requirements.txt`.
-
-[Further information about project dependencies](https://docs.kedro.org/en/stable/kedro_project_setup/dependencies.html#project-specific-dependencies)
-
-## How to work with Kedro and notebooks
-
-> Note: Using `kedro jupyter` or `kedro ipython` to run your notebook provides these variables in scope: `catalog`, `context`, `pipelines` and `session`.
->
-> Jupyter, JupyterLab, and IPython are already included in the project requirements by default, so once you have run `pip install -r requirements.txt` you will not need to take any extra steps before you use them.
-
-### Jupyter
-To use Jupyter notebooks in your Kedro project, you need to install Jupyter:
-
-```
-pip install jupyter
-```
-
-After installing Jupyter, you can start a local notebook server:
-
-```
-kedro jupyter notebook
-```
-
-### JupyterLab
-To use JupyterLab, you need to install it:
-
-```
-pip install jupyterlab
-```
-
-You can also start JupyterLab:
-
-```
-kedro jupyter lab
-```
-
-### IPython
-And if you want to run an IPython session:
-
-```
-kedro ipython
-```
-
-### How to ignore notebook output cells in `git`
-To automatically strip out all output cell contents before committing to `git`, you can use tools like [`nbstripout`](https://github.com/kynan/nbstripout). For example, you can add a hook in `.git/config` with `nbstripout --install`. This will run `nbstripout` before anything is committed to `git`.
-
-> *Note:* Your output cells will be retained locally.
-
-[Further information about using notebooks for experiments within Kedro projects](https://docs.kedro.org/en/develop/notebooks_and_ipython/kedro_and_notebooks.html).
-## Package your Kedro project
-
-[Further information about building project documentation and packaging your project](https://docs.kedro.org/en/stable/tutorial/package_a_project.html).
