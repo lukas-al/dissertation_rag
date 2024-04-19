@@ -1,10 +1,11 @@
 """
-Functions to serve the output of our retrieval algorithms.
+Functions to structure and serve the output of our retrieval algorithms and other results stuff.
 """
 
 from typing import List, Dict, Tuple
 from llama_index.core.schema import Document
 from datetime import datetime
+from pathlib import Path
 
 import json
 import pickle
@@ -24,7 +25,7 @@ def format_output(
 
     Args:
         top_k_docs (List[Document]): The result from the retrieval algorithm
-        query (str): The query input into the retrieval algorithm
+        query (str): The query input into the retrieval algorithm. Can also be 
         retrieval_algorithm (str): The name of the retrieval algorithm used
         document_index (List[Document]): The document index used for retrieval
 
@@ -69,6 +70,11 @@ def save_results(
     Args:
         results_dict (Dict[str, str]): The dictionary containing the results of the retrieval algorithm
     """
+    # Get the path of the current file
+    current_path = Path(__file__)
+    
+    # Construct the path to the directory
+    output_path = current_path.parent.parent.parent / "data/03_output"
 
     # Get the current date and time
     now = datetime.now()
@@ -77,7 +83,7 @@ def save_results(
     timestamp_str = now.strftime("%Y%m%d%H%M%S")
 
     # Use the timestamp in the output file path
-    output_path = f"./data/03_output/output_{timestamp_str}.pickle"
+    output_path = output_path / f"output_{timestamp_str}.pickle"
 
     with open(output_path, "wb") as f:
         pickle.dump(results_dict, f)

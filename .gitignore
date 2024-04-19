@@ -4,3 +4,9 @@
 
 # Data organisation
 *.xlsx
+
+# Results
+*.pickle
+
+# Compiled files
+*.pyc

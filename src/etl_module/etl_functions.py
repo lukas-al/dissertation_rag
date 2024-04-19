@@ -12,6 +12,7 @@ from collections import Counter
 import fitz
 from llama_index.core.schema import Document
 from llama_index.core import SimpleDirectoryReader
+from pathlib import Path
 
 
 def load_document_metadata() -> pd.DataFrame:
@@ -21,7 +22,13 @@ def load_document_metadata() -> pd.DataFrame:
     Returns:
         pd.DataFrame: The document metadata as a pandas DataFrame.
     """
-    doc_metadata_df = pd.read_excel("./config/data_organisation.xlsx", index_col=0)
+    # Get the path of the current file
+    current_path = Path(__file__)
+    
+    # Construct the path to the documents directory
+    path_to_file = current_path.parent.parent.parent / "config" / "data_organisation.xlsx"
+    
+    doc_metadata_df = pd.read_excel(path_to_file, index_col=0)
 
     return doc_metadata_df
 
@@ -194,8 +201,12 @@ def load_documents() -> List[Document]:
     Returns:
         List[Document]: Our index of documents, as a list.
     """
-
-    path_to_docs = "./data/01_raw"
+    # Get the path of the current file
+    current_path = Path(__file__)
+    
+    # Construct the path to the documents directory
+    path_to_docs = current_path.parent.parent.parent / "data/01_raw"
+    
     doc_list = SimpleDirectoryReader(
         path_to_docs, file_metadata=get_metadata
     ).load_data()
