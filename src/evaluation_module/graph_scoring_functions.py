@@ -18,14 +18,15 @@ from typing import List, Dict, Any, AnyStr
 from sklearn.metrics import f1_score, precision_score, recall_score
 from llama_index.core.schema import Document
 
-def construct_graph(
+def construct_graph_top_k(
     embedded_index: List[Document],
     retrieval_algorithm: callable,
     edge_threshold: float = 0.5,
     **kwargs,
 ) -> nx.Graph:
     """
-    Constructs a graph based on the similarity of the documents.
+    Constructs a graph based on the similarity of the documents, using a top k retrieval algorithm.
+    The top k algorithm is pretty inneficent, but it's a good starting point for the evaluation.
 
     Parameters:
     - embedded_index (List[Document]): A list of embedded documents.
@@ -61,17 +62,19 @@ def construct_graph(
     # Add the connections to the graph
     for node, connected_nodes in connections.items():
         graph.add_weighted_edges_from([(node, c_nd[0], c_nd[1][0][0]) for c_nd in connected_nodes if c_nd[1][0][0] > edge_threshold])
-
-    
-    # # Pump metadata into the nodes
-    # for nd in list(evaluate_graph.nodes):
-    #     for doc in embedded_index:
-    #         if doc.id_ == nd:
-    #             # Unpack the metadata dict into the node, on top of what is already there
-    #             graph.nodes[nd].update(doc.metadata)
     
     return graph
+
+
+def construct_graph_adjacency_matrix(
+    embedded_index: List[Document],
+    distance_metric: callable,
+    edge_threshold: float = 0.5,
+) -> nx.Graph:
+    """Construct a graph based on using an adjacency matrix approach. More efficient than using the retrieval algorithm directly."""
     
+    return
+
 
 def simple_stats(graph: nx.Graph) -> Dict[AnyStr, Any]:
     """

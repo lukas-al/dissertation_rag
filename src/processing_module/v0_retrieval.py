@@ -63,6 +63,7 @@ def retrieve_top_k(
     Returns:
         List[Tuple[str, float]]: the top k most similar documents
     """
+
     # Create a list to store the similarity scores and document ids
     similarity_scores = []
 
