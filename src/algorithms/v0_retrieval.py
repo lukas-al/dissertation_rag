@@ -3,7 +3,7 @@
 from typing import List, Tuple
 from llama_index.core.schema import Document
 from sklearn.metrics.pairwise import cosine_similarity
-from ..etl_module.embedding_functions import embed_query
+from ..etl.embedding_funcs import embed_query
 from numpy import array
 
 

@@ -32,6 +32,15 @@ def embed_index(document_index: List[Document]) -> List[Document]:
         for doc in document_index:
             # Embed the document text
             doc.embedding = model.encode(doc.text).tolist()
+            
+            # Deal with the doc name
+            doc_name = doc.metadata['file_name'].split("/")[-1].split(".")[0]
+            doc.metadata['embedded_name'] = model.encode(doc_name)
+            
+            # Deal with the doc description
+            doc_desc = doc.metadata['Description']
+            doc.metadata['embedded_description'] = model.encode(doc_desc)
+            
             pbar.update(1)
 
     return document_index

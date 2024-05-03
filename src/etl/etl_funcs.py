@@ -24,10 +24,12 @@ def load_document_metadata() -> pd.DataFrame:
     """
     # Get the path of the current file
     current_path = Path(__file__)
-    
+
     # Construct the path to the documents directory
-    path_to_file = current_path.parent.parent.parent / "config" / "data_organisation.xlsx"
-    
+    path_to_file = (
+        current_path.parent.parent.parent / "config" / "data_organisation.xlsx"
+    )
+
     doc_metadata_df = pd.read_excel(path_to_file, index_col=0)
 
     return doc_metadata_df
@@ -203,10 +205,10 @@ def load_documents() -> List[Document]:
     """
     # Get the path of the current file
     current_path = Path(__file__)
-    
+
     # Construct the path to the documents directory
     path_to_docs = current_path.parent.parent.parent / "data/01_raw"
-    
+
     doc_list = SimpleDirectoryReader(
         path_to_docs, file_metadata=get_metadata
     ).load_data()

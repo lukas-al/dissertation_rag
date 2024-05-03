@@ -8,3 +8,7 @@ V2 of the retrieval algorith - using a neural network to identify relevant featu
 
 # Training an auto-encoder with stuff missed out.
 # Will reproduce missed out bits of X
+
+
+# What methods can I actually employ?
+# Dimensionality reduction using an autoencoder?

@@ -1,8 +1,8 @@
 # Main entry point to application
 
-from src.etl_module import etl_functions, embedding_functions
-from src.processing_module import v0_retrieval
-from src.evaluation_module import output_functions, graph_scoring_functions
+from src.etl import embedding_funcs, etl_funcs
+from src.processing import v0_retrieval
+from src.evaluation import graph_scoring, output_funcs
 
 
 def main():
@@ -15,12 +15,11 @@ def main():
     !@TODO Currently has some hard-coded dependencies
     """
     
-    # Initially assume 
     # Load the document index
-    document_index = etl_functions.load_documents()
+    document_index = etl_funcs.load_documents()
 
     # Embed the document index
-    embedded_index = embedding_functions.embed_index(document_index)
+    embedded_index = embedding_funcs.embed_index(document_index)
 
     # Present a dummy query
     query = "What is inflation currently?"
@@ -29,7 +28,7 @@ def main():
     top_k_results = v0_retrieval.retrieve_top_k_query(query, embedded_index, k=2)
 
     # Format the results
-    results = output_functions.format_output(
+    results = output_funcs.format_output(
         top_k_results,
         query,
         "v0_retrieval",
@@ -42,16 +41,16 @@ def main():
     
     # Print the results and evaluation
     # evaluation_functions.present_results(results, evaluation)
-    graph = graph_scoring_functions.construct_graph(
+    graph = graph_scoring.construct_graph(
         embedded_index,
         v0_retrieval.retrieve_top_k,
         edge_threshold=0.5,
         k=5
     )
-    graph_evaluation = graph_scoring_functions.evaluate_graph(graph)
+    graph_evaluation = graph_scoring.evaluate_graph(graph)
     
     # Save the results
-    output_functions.save_results(
+    output_funcs.save_results(
         results,
         # evaluation,
     )

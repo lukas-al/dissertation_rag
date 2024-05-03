@@ -35,3 +35,26 @@ What about which content to use?
 
 Looking at the landscape of available content makes me think that I'll need to use the Notes portal.  I don't think there is enough overlap in a lot of the data from the external publications and it doesn't combine well. On the other hand, the Notes portal has a lot of overlapping content and much more metadata to create other structural links.
 
+
+## Ideas for more matching:
+Linguistic and structural features that help us to match the tree
+- Matching numbers
+- Pairs or triples of words
+- Named entity recognition
+- Links
+
+Authorship, year, etc are obviously going to turbocharge the document recognition. But can other linguistic features work as well? This is a useful question.
+
+Essentially:
+- You could get a really good search based on metadata, named entity recognition, etc
+- How good can it get without the embeddings?
+- And vice-versa
+
+This should result in a big table of scores.
+
+Interesting question:
+- To what level is matching numbers and named entities a good proxy for date
+
+Another Idea:
+- Overloading the embedding with metadata - put it all into the document text and embed that entirely at once.
+- Does this deal with blanks better? Does it deal with nulls better.

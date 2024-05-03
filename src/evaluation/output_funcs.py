@@ -7,7 +7,6 @@ from llama_index.core.schema import Document
 from datetime import datetime
 from pathlib import Path
 
-import json
 import pickle
 
 
@@ -25,7 +24,7 @@ def format_output(
 
     Args:
         top_k_docs (List[Document]): The result from the retrieval algorithm
-        query (str): The query input into the retrieval algorithm. Can also be 
+        query (str): The query input into the retrieval algorithm. Can also be
         retrieval_algorithm (str): The name of the retrieval algorithm used
         document_index (List[Document]): The document index used for retrieval
 
@@ -72,7 +71,7 @@ def save_results(
     """
     # Get the path of the current file
     current_path = Path(__file__)
-    
+
     # Construct the path to the directory
     output_path = current_path.parent.parent.parent / "data/03_output"
 

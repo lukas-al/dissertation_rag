@@ -25,33 +25,29 @@ def retrieve_top_k(
     Returns:
         List[Tuple[str, float]]: A list of tuples containing the document ID and similarity score of the top k similar documents.
     """
-    
+
     # Instantiate embedding model to be used @TODO: Move this to a config file
     embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-    
+
     # Create a list to store the similarity scores and document ids
     similarity_scores = []
-    
+
     # Iterate over the documents in the index
     for doc in doc_index:
         # Calculate the distance vector between the documents
         distance_vector = calculate_distance_vector(
-            query_doc, 
-            doc, 
-            embed_model,
-            fuzz_thresh=80
+            query_doc, doc, embed_model, fuzz_thresh=80
         )
 
-        # Combine the distance vector into a single score. 
+        # Combine the distance vector into a single score.
         sim_score = sum(distance_vector) / len(distance_vector)
-        
+
         # Append the similarity score and document id to the list
         similarity_scores.append((doc.id_, sim_score))
-        
-    
+
     # Sort the similarity scores in descending order
     similarity_scores.sort(key=lambda x: x[1], reverse=True)
 
     top_k = similarity_scores[:k]
-    
+
     return top_k
