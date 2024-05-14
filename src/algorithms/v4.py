@@ -3,7 +3,7 @@ Implement BM25 for text similarity as a more sophisticated bag-of-words algorith
 """
 
 import numpy as np
-
+import copy
 from fastbm25 import fastbm25
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from llama_index.core.schema import Document
@@ -21,15 +21,23 @@ class V4Retriever(AbstractRetriever):
         self, name: str = "V4Retriever", version: str = "0.1", embedded_index=None
     ):
         super().__init__(name, version)
-        self.embedded_index = embedded_index
 
-        if self.embedded_index is None:
+        if embedded_index is None:
             raise ValueError(
                 "The embedded index is not set. This algorithm will not work without one."
             )
-            
-        print(f"Initialised {self.name} v{self.version}")
+                    
+        # Initialise the model
+        tokenised_corpus = []
+        for doc in embedded_index:
+            tokenised_text = doc.text.split()
+            tokenised_corpus.append(tokenised_text)
 
+        model = fastbm25(tokenised_corpus)
+        self.model = model
+
+        print(f"Initialised {self.name} v{self.version}")
+        
     # @Override
     def retrieve_top_k_doc(
         self,
@@ -77,6 +85,33 @@ class V4Retriever(AbstractRetriever):
         """
         return self.calc_sim_score(doc1, doc2)
 
+    # def calc_sim_score(self, doc1, doc2):
+    #     """
+    #     Calculates the similarity score between two documents using the BM25 algorithm.
+
+    #     Args:
+    #         doc1 (Document): The first document.
+    #         doc2 (Document): The second document.
+
+    #     Returns:
+    #         float: The similarity score between the two documents.
+    #     """
+    #     assert self.embedded_index is not None, "The embedded index is not set"
+
+    #     embedded_index = self.embedded_index
+
+    #     tokenised_corpus = []
+    #     for doc in embedded_index:
+    #         tokenised_text = doc.text.split()
+    #         tokenised_corpus.append(tokenised_text)
+
+    #     model = fastbm25(tokenised_corpus)
+
+    #     tokenised_doc1 = doc1.text.split()
+    #     tokenised_doc2 = doc2.text.split()
+
+    #     return model.similarity_bm25(tokenised_doc1, tokenised_doc2)
+
     def calc_sim_score(self, doc1, doc2):
         """
         Calculates the similarity score between two documents using the BM25 algorithm.
@@ -88,23 +123,15 @@ class V4Retriever(AbstractRetriever):
         Returns:
             float: The similarity score between the two documents.
         """
-        assert self.embedded_index is not None, "The embedded index is not set"
-
-        embedded_index = self.embedded_index
-
-        tokenised_corpus = []
-        for doc in embedded_index:
-            tokenised_text = doc.text.split()
-            tokenised_corpus.append(tokenised_text)
-
-        model = fastbm25(tokenised_corpus)
 
         tokenised_doc1 = doc1.text.split()
         tokenised_doc2 = doc2.text.split()
 
-        return model.similarity_bm25(tokenised_doc1, tokenised_doc2)
-
-    def normalise_adj_dict(self, adj_dict):
+        return self.model.similarity_bm25(tokenised_doc1, tokenised_doc2)
+        
+        
+        
+    def normalise_adj_dict(self, glbl_adj_dict):
         """
         Normalise the adjacency dictionary.
 
@@ -114,7 +141,8 @@ class V4Retriever(AbstractRetriever):
         Returns:
             dict: The normalised adjacency dictionary.
         """
-
+        adj_dict = copy.deepcopy(glbl_adj_dict)
+        
         total_weights = []
         for doc in adj_dict.keys():
             for doc2 in adj_dict[doc].keys():
@@ -123,7 +151,7 @@ class V4Retriever(AbstractRetriever):
         # Fit a minmax scaler
         scaler = RobustScaler()
         scaler.fit(np.array(total_weights).reshape(-1, 1))
-
+        
         # Scale the weights
         for doc in adj_dict.keys():
             for doc2 in adj_dict[doc].keys():

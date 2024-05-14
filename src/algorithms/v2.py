@@ -14,6 +14,9 @@ class V2Retriever(AbstractRetriever):
     V2 of the retrieval algorithm, using a neural network to output the final sim score based on the distance vector
     """
 
+    def __init__(self):
+        raise NotImplementedError
+    
     # @Override
     def retrieve_top_k_doc(
         self,

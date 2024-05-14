@@ -20,9 +20,9 @@ def main():
     embedded_index = embedding_funcs.embed_index(document_index)
     
     # v0 algorithm
-    adj_matrix = graph_construction.construct_adjacency_dict(
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
         embedded_index,
-        v0.V0Retriever(name="v0_algo", version="0.1")
+        v0.V0Retriever
     )
 
     # persist the results
@@ -38,9 +38,9 @@ def main():
     )
     
     # v1 algorithm
-    adj_matrix = graph_construction.construct_adjacency_dict(
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
         embedded_index,
-        v1.V1Retriever(name='v1_algo')
+        v1.V1Retriever
     )
 
     # persist the results
@@ -57,8 +57,10 @@ def main():
     )
 
     # v3 algorithm
-    v3_retriever = v3.V3Retriever(name='v3_algo')
-    adj_matrix = v3_retriever.construct_adjacency_dict(embed_index=embedded_index)
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index,
+        v3.V3Retriever
+    )
     
     # persist the results
     persist_results.save_results(
@@ -73,11 +75,12 @@ def main():
     )
     
     # v4 algorithm
-    adj_matrix = graph_construction.construct_adjacency_dict(
-        embedded_index,
-        v4.V4Retriever(name='v4_algo', embedded_index=embedded_index[::3])
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index, 
+        v4.V4Retriever, 
+        algo_type="v4"
     )
-    
+
     # persist the results
     persist_results.save_results(
         experiment_type="v4",
@@ -93,14 +96,12 @@ def main():
         }
     )
     
-    # v5 algorithm
-    adj_matrix = graph_construction.construct_adjacency_dict(
-        embedded_index,
-        v5.V5Retriever(
-            name='v5_algo_spacy_lg', 
-            embedded_index=embedded_index,
-            spacy_model=spacy.load("en_core_web_lg", disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
-            )
+    
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index, 
+        v5.V5Retriever, 
+        algo_type="v5",
+        spacy_model_name="en_core_web_lg"
     )
     
     # persist the results
