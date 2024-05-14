@@ -6,8 +6,10 @@ from llama_index.core.schema import Document
 from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import RobustScaler
+from collections import defaultdict
 import tqdm
+import concurrent.futures
 
 from ..processing.distance_metrics import calculate_distance_vector
 
@@ -17,14 +19,14 @@ class V3Retriever(AbstractRetriever):
     V1 of the retrieval algorithm, scoring a linear average of the embeddings and metadata distances.
     The aggregation calculation could definitely be made more sophisticated...
     """
-     
+
     # @Override
     def retrieve_top_k_doc(
         self,
         doc1: Document,
         embedded_index: List[Document],
         k: int = 5,
-        fuzzy_thresh: int = 80
+        fuzzy_thresh: int = 80,
     ) -> List[Tuple[str, float]]:
         """Retrieve the top k documents from the embedded index based on their similarity scores.
 
@@ -37,19 +39,16 @@ class V3Retriever(AbstractRetriever):
         Returns:
             List[Tuple[str, float]]: A list of tuples containing the document ID and its similarity score.
         """
-        
+
         sim_scores = []
         for doc in embedded_index:
             print("Calcing the score for: ", doc.id_)
-            sim_scores.append(
-                (doc.id_, self.calculate_distance(doc1, doc))
-            )
-        
+            sim_scores.append((doc.id_, self.calculate_distance(doc1, doc)))
+
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        
+
         return sim_scores[:k]
-    
-    
+
     # @Override
     def calculate_distance(
         self,
@@ -69,28 +68,59 @@ class V3Retriever(AbstractRetriever):
             AttributeError: If PCA has not been calculated yet. Please run calculate_pca first.
         """
         try:
-            self.pca_result
+            self.adj_dict
         except AttributeError:
-            raise AttributeError("PCA not calculated yet. Please run calculate_pca first.")
-            
-        return self.return_sim_score(doc1, doc2)
-    
+            raise AttributeError(
+                "Adj dict not calculated yet."
+            )
 
-    def construct_adjacency_dict(self, embed_index):
+        if not self.is_pca_applied:
+            # do pca
+            pass
+        
+        return self.adj_dict[doc1.id_][doc2.id_]["weight"]
+
+
+    def calculate_distance_vector(self, doc1, doc2) -> list:
         """
-        Constructs and returns an adjacency dictionary based on the given embed_index.
+        Calculates the distance vector between two documents.
 
-        Parameters:
-        embed_index (int): The index of the embedding.
+        Args:
+            doc1: The first document.
+            doc2: The second document.
 
         Returns:
-        dict: The adjacency dictionary representing the graph.
+            A list representing the distance vector between the two documents.
         """
-        self.calculate_pca(embed_index)
-        return self.adj_dict
+        return calculate_distance_vector(doc1, doc2)
 
     
-    def calculate_pca(
+    def pca_vector_dict(self, vector_dict):
+        """Take the dict with vectors of weights calcd elsewhere and apply a pca weighting to them.
+
+        Args:
+            adj_dict (_type_): _description_
+        """
+        # Fit the PCA on the data
+        distance_vectors = []
+        
+        for k, v in vector_dict.items():
+            for k2, v2 in v.items():
+                distance_vectors.append(v2["vector"])
+        
+        # Fit the pca
+        pca_mod = PCA(n_components=3).fit(distance_vectors)
+        
+        # Apply the pca to each item
+        pca_adj_dict = vector_dict.copy()
+        
+        for k, v in vector_dict.items():
+            for k2, v2 in v.items():
+                pca_adj_dict[k][k2]["weight"] = pca_mod.transform([v2["vector"]]).mean(axis=1)
+                
+        return pca_adj_dict
+
+    def calculate_adj_dict(
         self,
         embed_index: List[Document],
     ) -> float:
@@ -110,35 +140,46 @@ class V3Retriever(AbstractRetriever):
         """
         try:
             self.distance_vectors
-        except AttributeError:
-            distance_vectors = []
-            for doc0 in tqdm.tqdm(embed_index, desc='Calculating distance vectors'):
-                for doc1 in embed_index:
-                    distance_vectors.append(
-                        calculate_distance_vector(doc0, doc1)
-                    )
-            self.distance_vectors = distance_vectors
+            
+        except AttributeError:            
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = {}
+                for doc0 in tqdm.tqdm(embed_index, desc="Calculating distance vectors"):
+                    for doc1 in embed_index:
+                        future = executor.submit(calculate_distance_vector, doc0, doc1)
+                        futures[future] = (doc0.id_, doc1.id_)
+                        # futures.append((doc0.id_, doc1.id_, executor.submit(calculate_distance_vector, doc0, doc1)))
+                
+                results = [] 
+                for future in concurrent.futures.as_completed(futures):
+                    doc0_id, doc1_id = futures[future]
+                    results.append((doc0_id, doc1_id, future.result()))
+            
+            self.distance_vectors = results
         
         # Calculate the PCA
-        self.pca_result = PCA(n_components=3).fit_transform(self.distance_vectors).mean(axis=1)
-        
-        self.scaled_pca = MinMaxScaler(feature_range=(0, 1)).fit_transform(self.pca_result.reshape(-1, 1))
-        
+        pca_res = (
+            PCA(n_components=3).fit_transform([x[2] for x in self.distance_vectors]).mean(axis=1)
+        )
+
+        scaled_pca = RobustScaler().fit_transform(
+            pca_res.reshape(-1, 1)
+        )
+
         # Put the results of the PCA into an adj_dict_format so our 'calculate_distance' function can use it
-        adj_dict = {}
-        
-        # Need to enum the ordered list of results to fit it into the adj_dict format
-        for i, doc0 in enumerate(embed_index):
-            adj_dict[doc0.id_] = {}
-            for j, doc1 in enumerate(embed_index):
-                adj_dict[doc0.id_][doc1.id_] = {
-                    'weight': self.scaled_pca[i*len(embed_index) + j][0]
-                }
-        
+        adj_dict = defaultdict(dict)
+
+        for res, val in zip(self.distance_vectors, scaled_pca):
+            adj_dict[res[0]][res[1]] = {
+                "weight": val
+            }
+
         # Store the adjacency dict
         self.adj_dict = adj_dict
-    
-    
+        
+        return self.adj_dict
+        
+        
     def return_sim_score(self, doc0, doc1):
         """
         Returns the similarity score between two documents.
@@ -150,4 +191,4 @@ class V3Retriever(AbstractRetriever):
         Returns:
             float: The similarity score between the two documents.
         """
-        return self.adj_dict[doc0.id_][doc1.id_]['weight']
+        return self.adj_dict[doc0.id_][doc1.id_]["weight"]

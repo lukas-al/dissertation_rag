@@ -14,14 +14,14 @@ class V1Retriever(AbstractRetriever):
     V1 of the retrieval algorithm, scoring a linear average of the embeddings and metadata distances.
     The aggregation calculation could definitely be made more sophisticated...
     """
-     
+
     # @Override
     def retrieve_top_k_doc(
         self,
         doc1: Document,
         embedded_index: List[Document],
         k: int = 5,
-        fuzzy_thresh: int = 80
+        fuzzy_thresh: int = 80,
     ) -> List[Tuple[str, float]]:
         """Retrieve the top k documents from the embedded index based on their similarity scores.
 
@@ -34,19 +34,16 @@ class V1Retriever(AbstractRetriever):
         Returns:
             List[Tuple[str, float]]: A list of tuples containing the document ID and its similarity score.
         """
-        
+
         sim_scores = []
         for doc in embedded_index:
             print("Calcing the score for: ", doc.id_)
-            sim_scores.append(
-                (doc.id_, self.calculate_distance(doc1, doc))
-            )
-        
+            sim_scores.append((doc.id_, self.calculate_distance(doc1, doc)))
+
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        
+
         return sim_scores[:k]
-    
-    
+
     # @Override
     def calculate_distance(
         self,
@@ -54,7 +51,7 @@ class V1Retriever(AbstractRetriever):
         doc2: Document,
     ) -> float:
         """
-        Calculate the distance between two documents using a 
+        Calculate the distance between two documents using a
         weighted combination of embeddings and metadata.
 
         Parameters:
@@ -64,16 +61,14 @@ class V1Retriever(AbstractRetriever):
         Returns:
         - float: The calculated distance between the two documents.
         """
-        
+
         distance_vector = calculate_distance_vector(
             # doc1, doc2, self.embed_model
-            doc1, doc2
+            doc1,
+            doc2,
         )
 
         # Simple linear combination of the metrics
         sim_score = sum(distance_vector) / len(distance_vector)
-        
+
         return sim_score
-    
-    
-    

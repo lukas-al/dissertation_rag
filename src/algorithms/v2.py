@@ -13,19 +13,14 @@ class V2Retriever(AbstractRetriever):
     """
     V2 of the retrieval algorithm, using a neural network to output the final sim score based on the distance vector
     """
-    # @Override
-    def __init__(self, name = None, version = None, embed_model = None):
-        self.name = name
-        self.version = version
-        self.embed_model = embed_model
-    
+
     # @Override
     def retrieve_top_k_doc(
         self,
         doc1: Document,
         embedded_index: List[Document],
         k: int = 5,
-        fuzzy_thresh: int = 80
+        fuzzy_thresh: int = 80,
     ) -> List[Tuple[str, float]]:
         """Retrieve the top k documents from the embedded index based on their similarity scores.
 
@@ -38,19 +33,16 @@ class V2Retriever(AbstractRetriever):
         Returns:
             List[Tuple[str, float]]: A list of tuples containing the document ID and its similarity score.
         """
-        
+
         sim_scores = []
         for doc in embedded_index:
             print("Calcing the score for: ", doc.id_)
-            sim_scores.append(
-                (doc.id_, self.calculate_distance(doc1, doc))
-            )
-        
+            sim_scores.append((doc.id_, self.calculate_distance(doc1, doc)))
+
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        
+
         return sim_scores[:k]
-    
-    
+
     # @Override
     def calculate_distance(
         self,
@@ -58,7 +50,7 @@ class V2Retriever(AbstractRetriever):
         doc2: Document,
     ) -> float:
         """
-        Calculate the distance between two documents using a 
+        Calculate the distance between two documents using a
         weighted combination of embeddings and metadata.
 
         Parameters:
@@ -68,18 +60,19 @@ class V2Retriever(AbstractRetriever):
         Returns:
         - float: The calculated distance between the two documents.
         """
-        
+
+        raise NotImplementedError
+    
         distance_vector = calculate_distance_vector(
             # doc1, doc2, self.embed_model
-            doc1, doc2
+            doc1,
+            doc2,
         )
 
         # NN prediction of the output score based on input metrics
         sim_score = self.nn_score(distance_vector)
-        
+
         return sim_score
-    
-    
+
     def nn_score(self, distance_vector):
-        pass
-    
+        raise NotImplementedError

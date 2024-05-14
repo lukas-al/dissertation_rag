@@ -8,18 +8,20 @@ from llama_index.core.schema import Document
 from sklearn.metrics.pairwise import cosine_similarity
 from numpy import array
 
+
 class V0Retriever(AbstractRetriever):
     """
     V0 of the retrieval algorithm, using a simple cosine similarity between embeddings
     of the document's text.
     """
+
     # @Override
     def retrieve_top_k_doc(
         self,
-        doc1: Document, 
-        embedded_index: List[Document], 
-        k: int = 5, 
-        fuzzy_thresh: int = 80
+        doc1: Document,
+        embedded_index: List[Document],
+        k: int = 5,
+        fuzzy_thresh: int = 80,
     ) -> List[Tuple[str, float]]:
         """
         Retrieve the top k most similar documents to a given document.
@@ -35,15 +37,12 @@ class V0Retriever(AbstractRetriever):
         """
         sim_scores = []
         for doc in embedded_index:
-            sim_scores.append(
-                (doc.id_, self.calculate_distance(doc1, doc))
-            )
-        
+            sim_scores.append((doc.id_, self.calculate_distance(doc1, doc)))
+
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        
+
         return sim_scores[:k]
 
-    
     # @Override
     def calculate_distance(self, doc1: Document, doc2: Document) -> float:
         """
@@ -57,8 +56,7 @@ class V0Retriever(AbstractRetriever):
         float: The similarity score between the two documents.
         """
         sim_score = cosine_similarity(
-            array(doc1.embedding).reshape(1, -1),
-            array(doc2.embedding).reshape(1, -1)
+            array(doc1.embedding).reshape(1, -1), array(doc2.embedding).reshape(1, -1)
         )
-        
+
         return sim_score

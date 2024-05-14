@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from Levenshtein import ratio
 from pandas import to_datetime
 from fuzzywuzzy import fuzz, process
+
 # from sentence_transformers import SentenceTransformer
 import numpy as np
 
@@ -28,7 +29,7 @@ def node_name_distance(doc0, doc1) -> float:
     # semantic_similarity:
     doc0_emb = doc0.metadata["embedded_name"]
     doc1_emb = doc1.metadata["embedded_name"]
-    
+
     # doc0_emb = embed_model.encode(doc0_name)
     # doc1_emb = embed_model.encode(doc1_name)
 
@@ -53,7 +54,7 @@ def node_text_distance(doc0, doc1) -> float:
     Returns:
         float: the distance between the two nodes
     """
-    
+
     sim_score = cosine_similarity(
         np.array(doc0.embedding).reshape(1, -1), np.array(doc1.embedding).reshape(1, -1)
     )[0][0]
@@ -77,7 +78,7 @@ def description_distance_metric(doc0, doc1):
 
     # doc0_emb = embed_model.encode(doc0_desc)
     # doc1_emb = embed_model.encode(doc1_desc)
-    
+
     doc0_emb = doc0.metadata["embedded_description"]
     doc1_emb = doc1.metadata["embedded_description"]
 

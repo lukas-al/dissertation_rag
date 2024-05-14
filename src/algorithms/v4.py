@@ -1,33 +1,42 @@
 """
 Implement BM25 for text similarity as a more sophisticated bag-of-words algorithm
 """
+
 import numpy as np
 
 from fastbm25 import fastbm25
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from llama_index.core.schema import Document
 from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple
+
 
 class V4Retriever(AbstractRetriever):
     """
     V4 of the retrieval algorithm, scoring a BM25 similarity between the documents.
     """
+
     # @Override
-    def __init__(self, name: str = "V4Retriever", version: str = "0.1", embedded_index = None):
+    def __init__(
+        self, name: str = "V4Retriever", version: str = "0.1", embedded_index=None
+    ):
         super().__init__(name, version)
         self.embedded_index = embedded_index
-        
+
         if self.embedded_index is None:
-            raise ValueError("The embedded index is not set. This algorithm will not work without one.")
-    
+            raise ValueError(
+                "The embedded index is not set. This algorithm will not work without one."
+            )
+            
+        print(f"Initialised {self.name} v{self.version}")
+
     # @Override
     def retrieve_top_k_doc(
         self,
         doc1: Document,
         embedded_index: List[Document],
         k: int = 5,
-        fuzzy_thresh: int = 80
+        fuzzy_thresh: int = 80,
     ) -> List[Tuple[str, float]]:
         """Retrieve the top k documents from the embedded index based on their similarity scores.
 
@@ -40,19 +49,16 @@ class V4Retriever(AbstractRetriever):
         Returns:
             List[Tuple[str, float]]: A list of tuples containing the document ID and its similarity score.
         """
-        
+
         sim_scores = []
         for doc in embedded_index:
             print("Calcing the score for: ", doc.id_)
-            sim_scores.append(
-                (doc.id_, self.calculate_distance(doc1, doc))
-            )
-        
+            sim_scores.append((doc.id_, self.calculate_distance(doc1, doc)))
+
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        
+
         return sim_scores[:k]
-    
-    
+
     # @Override
     def calculate_distance(
         self,
@@ -70,8 +76,7 @@ class V4Retriever(AbstractRetriever):
             float: The distance between the two documents.
         """
         return self.calc_sim_score(doc1, doc2)
-    
-    
+
     def calc_sim_score(self, doc1, doc2):
         """
         Calculates the similarity score between two documents using the BM25 algorithm.
@@ -98,8 +103,7 @@ class V4Retriever(AbstractRetriever):
         tokenised_doc2 = doc2.text.split()
 
         return model.similarity_bm25(tokenised_doc1, tokenised_doc2)
-    
-    
+
     def normalise_adj_dict(self, adj_dict):
         """
         Normalise the adjacency dictionary.
@@ -110,21 +114,21 @@ class V4Retriever(AbstractRetriever):
         Returns:
             dict: The normalised adjacency dictionary.
         """
-        
-        adj_dict = adj_dict.copy()
-        
+
         total_weights = []
         for doc in adj_dict.keys():
             for doc2 in adj_dict[doc].keys():
-                total_weights.append(adj_dict[doc][doc2]['weight'])
-                
+                total_weights.append(adj_dict[doc][doc2]["weight"])
+
         # Fit a minmax scaler
-        scaler = MinMaxScaler()
+        scaler = RobustScaler()
         scaler.fit(np.array(total_weights).reshape(-1, 1))
 
         # Scale the weights
         for doc in adj_dict.keys():
             for doc2 in adj_dict[doc].keys():
-                adj_dict[doc][doc2]['weight'] = scaler.transform(np.array(adj_dict[doc][doc2]['weight']).reshape(-1, 1))[0][0]
+                adj_dict[doc][doc2]["weight"] = scaler.transform(
+                    np.array(adj_dict[doc][doc2]["weight"]).reshape(-1, 1)
+                )[0][0]
 
         return adj_dict

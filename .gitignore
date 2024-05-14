@@ -13,3 +13,6 @@
 
 # Config
 .vscode/
+
+# Notebooks
+notebooks/dev/
