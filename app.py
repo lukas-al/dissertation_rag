@@ -1,61 +1,120 @@
 # Main entry point to application
+import spacy
 
-from src.etl_module import etl_functions, embedding_functions
-from src.processing_module import v0_retrieval
-from src.evaluation_module import output_functions, graph_scoring_functions
+from src.etl import embedding_funcs, etl_funcs
+from src.processing import graph_construction
+from src.algorithms import v0, v1, v3, v4, v5
+from src.utils import persist_results
 
+from datetime import datetime
 
 def main():
     """
     Executes the main process of the application.
-
-    This function loads the document index, embeds the index, retrieves the top k documents
-    based on a dummy query, formats the results, saves the results, and evaluates the process.
-
-    !@TODO Currently has some hard-coded dependencies
     """
     
-    # Initially assume 
-    # Load the document index
-    document_index = etl_functions.load_documents()
-
-    # Embed the document index
-    embedded_index = embedding_functions.embed_index(document_index)
-
-    # Present a dummy query
-    query = "What is inflation currently?"
-
-    # Retrieve the top k documents
-    top_k_results = v0_retrieval.retrieve_top_k_query(query, embedded_index, k=2)
-
-    # Format the results
-    results = output_functions.format_output(
-        top_k_results,
-        query,
-        "v0_retrieval",
-        document_index,
-    )
-
-    #! @TODO: !!!
-    # Evaluate the results of the process
-    # evaluation = evaluation_functions.evaluate_results(results)
+    curr_date = datetime.now().strftime("%Y-%m-%d")
     
-    # Print the results and evaluation
-    # evaluation_functions.present_results(results, evaluation)
-    graph = graph_scoring_functions.construct_graph(
+    # load and embed the documents
+    document_index = etl_funcs.load_documents()
+    embedded_index = embedding_funcs.embed_index(document_index)
+    
+    # v0 algorithm
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
         embedded_index,
-        v0_retrieval.retrieve_top_k,
-        edge_threshold=0.5,
-        k=5
+        v0.V0Retriever
     )
-    graph_evaluation = graph_scoring_functions.evaluate_graph(graph)
+
+    # persist the results
+    persist_results.save_results(
+        experiment_type="v0",
+        uuid=curr_date,
+        persist_objects={
+            "embedded_index": embedded_index,
+            "adj_matrix": adj_matrix,
+            'notes': "",
+            # "algorithm": v0.V0Retriever()
+        }
+    )
     
-    # Save the results
-    output_functions.save_results(
-        results,
-        # evaluation,
+    # v1 algorithm
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index,
+        v1.V1Retriever
     )
 
+    # persist the results
+    persist_results.save_results(
+        experiment_type="v1",
+        uuid=curr_date,
+        persist_objects={
+            "embedded_index": embedded_index,
+            "adj_matrix": adj_matrix,
+            'notes': "",
+            # "algorithm": v1.V1Retriever()
+            
+        }
+    )
 
+    # v3 algorithm
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index,
+        v3.V3Retriever
+    )
+    
+    # persist the results
+    persist_results.save_results(
+        experiment_type="v3",
+        uuid=curr_date,
+        persist_objects={
+            "embedded_index": embedded_index,
+            "adj_matrix": adj_matrix,
+            'notes': "",
+            # "algorithm": v3.V3Retriever()
+        }
+    )
+    
+    # v4 algorithm
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index, 
+        v4.V4Retriever, 
+        algo_type="v4"
+    )
+
+    # persist the results
+    persist_results.save_results(
+        experiment_type="v4",
+        uuid=curr_date,
+        persist_objects={
+            "embedded_index": embedded_index,
+            "adj_matrix": adj_matrix,
+            'notes': """
+            Operation only performed on 1/3 of the documents to speed up.
+            Needs significant performance optimisation to be useable.
+            """,
+            # "algorithm": v4.V4Retriever()
+        }
+    )
+    
+    
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index, 
+        v5.V5Retriever, 
+        algo_type="v5",
+        spacy_model_name="en_core_web_lg"
+    )
+    
+    # persist the results
+    persist_results.save_results(
+        experiment_type="v5",
+        uuid=curr_date,
+        persist_objects={
+            "embedded_index": embedded_index,
+            "adj_matrix": adj_matrix,
+            'notes': """""",
+        }
+    )
+    
+    
 if __name__ == "__main__":
     main()
