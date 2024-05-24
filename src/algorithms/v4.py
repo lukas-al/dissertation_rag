@@ -10,6 +10,7 @@ from llama_index.core.schema import Document
 from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple
 
+import warnings
 
 class V4Retriever(AbstractRetriever):
     """
@@ -23,18 +24,17 @@ class V4Retriever(AbstractRetriever):
         super().__init__(name, version)
 
         if embedded_index is None:
-            raise ValueError(
-                "The embedded index is not set. This algorithm will not work without one."
-            )
-                    
-        # Initialise the model
-        tokenised_corpus = []
-        for doc in embedded_index:
-            tokenised_text = doc.text.split()
-            tokenised_corpus.append(tokenised_text)
+            warnings.warn("The embedded index is not set. This algorithm will not work without one.")
+            # raise ValueError()
+        else:
+            # Initialise the model
+            tokenised_corpus = []
+            for doc in embedded_index:
+                tokenised_text = doc.text.split()
+                tokenised_corpus.append(tokenised_text)
 
-        model = fastbm25(tokenised_corpus)
-        self.model = model
+            model = fastbm25(tokenised_corpus)
+            self.model = model
 
         print(f"Initialised {self.name} v{self.version}")
         

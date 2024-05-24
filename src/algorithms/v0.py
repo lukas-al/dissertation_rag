@@ -57,6 +57,6 @@ class V0Retriever(AbstractRetriever):
         """
         sim_score = cosine_similarity(
             array(doc1.embedding).reshape(1, -1), array(doc2.embedding).reshape(1, -1)
-        )
+        )[0][0]
 
         return sim_score

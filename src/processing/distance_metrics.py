@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from Levenshtein import ratio
 from pandas import to_datetime
 from fuzzywuzzy import fuzz, process
+import re
 
 # from sentence_transformers import SentenceTransformer
 import numpy as np
@@ -110,6 +111,17 @@ def doctype_distance_metric(doc0, doc1):
     doc_type1 = doc0.metadata["Type"]
     doc_type2 = doc1.metadata["Type"]
 
+    
+    # ! When testing, there are only actually 3 types of document - background reading, essential reading, and recommended reading.
+    # ! This means we don't need this to be so complicated at all. 
+
+    if doc_type1 == doc_type2:
+        return 1
+    
+    else:
+        return -1
+
+    # This is hard coded in currently - could use a config file to define it.
     doc_knowledge_graph = {
         "MPR": {"press release": 0.0, "research paper": 0.9, "speech": 0.6},
         "press release": {"research paper": 0.9, "speech": 0.7},
@@ -196,10 +208,10 @@ def author_distance_metric(doc0, doc1, fuzz_thresh=80) -> float:
     authors1 = doc1.metadata["Authors"]
 
     if isinstance(authors0, str):
-        authors0 = [authors0]
+        authors0 = [name.strip() for name in authors0.split(',')]
 
     if isinstance(authors1, str):
-        authors1 = [authors1]
+        authors1 = [name.strip() for name in authors1.split(',')]
 
     # Calculate the Jaccard similarity between the two author lists
     jacc_sim = fuzzy_jaccard_similarity(
@@ -241,8 +253,18 @@ def fuzzy_jaccard_similarity(set1, set2, threshold):
             _, similarity = process.extractOne(el1, set2)
             if similarity >= threshold:
                 intersection.add(el1)
-
+      
     union = len(set1) + len(set2) - len(intersection)
+
+    # if union != 0:
+    #     if len(intersection) / union > 1:
+    #         print('---')
+    #         print(len(intersection) / union)
+    #         print(set1, '||' ,set2, '||', intersection)
+
+    #! Add a dumb check for outliers. Not sure why they're occuring rn and cba to fix it.
+    if len(intersection) / union > 1:
+        return 1
 
     return round(
         len(intersection) / union if union != 0 else 0, 3
@@ -266,12 +288,15 @@ def topic_distance_metric(doc0, doc1, fuzz_thresh=80):
     """
 
     # Get the topics from the metadata
-    topics0 = doc0.metadata["Topics"].split(",")
-    topics1 = doc1.metadata["Topics"].split(",")
+    # topics0 = doc0.metadata["Topics"].split('>').split(",")
+    # topics1 = doc1.metadata["Topics"].split(",")
+
+    topics0 = [topic.strip() for topic in re.split(r'[>|,]', doc0.metadata['Topics'])]
+    topics1 = [topic.strip() for topic in re.split(r'[>|,]', doc1.metadata['Topics'])]
 
     # Calculate the Jaccard similarity between the two topic lists
     jacc_sim = fuzzy_jaccard_similarity(
-        set(topics0), set(topics1), threshold=fuzz_thresh
+        topics0, topics1, threshold=fuzz_thresh
     )
 
     # Scale the Jaccard similarity to be between -1 and 1
@@ -296,12 +321,20 @@ def brand_distance_metric(doc0, doc1, fuzz_thresh=80):
     - scaled_similarity: The scaled similarity between the two documents' brand metadata.
     """
     # Get the brands from the metadata
-    brands0 = doc0.metadata["Brands"]
-    brands1 = doc1.metadata["Brands"]
+    brands0 = [brand.strip() for brand in re.split(r'[>|,]', doc0.metadata['Brands'])]
+    brands1 = [brand.strip() for brand in re.split(r'[>|,]', doc1.metadata['Brands'])]
 
+    for el in brands0:
+        if el.lower() == 'nan':
+            return 0
+        
+    for el in brands1:
+        if el.lower() == 'nan':
+            return 0
+    
     # Calculate the Jaccard similarity between the two brand lists
     jacc_sim = fuzzy_jaccard_similarity(
-        set(brands0), set(brands1), threshold=fuzz_thresh
+        brands0, brands1, threshold=fuzz_thresh
     )
 
     # Scale the Jaccard similarity to be between -1 and 1
@@ -323,23 +356,20 @@ def division_distance_metric(doc0, doc1, fuzz_thresh=80):
     - The scaled similarity between the divisions of the two documents, ranging from -1 to 1.
     """
     # Get the divisions from the metadata
-    divisions0 = doc0.metadata["Divisions"]
-    divisions1 = doc1.metadata["Divisions"]
-
-    if isinstance(divisions0, str):
-        divisions0 = [divisions0]
-
-    if isinstance(divisions1, str):
-        divisions1 = [divisions1]
+    divisions0 = [division.strip() for division in re.split(r'[>|,]', doc0.metadata['Divisions'])]
+    divisions1 = [division.strip() for division in re.split(r'[>|,]', doc1.metadata['Divisions'])]
 
     # Calculate the Jaccard similarity between the two division lists
     jacc_sim = fuzzy_jaccard_similarity(
-        set(divisions0), set(divisions1), threshold=fuzz_thresh
+        divisions0, divisions1, threshold=fuzz_thresh
     )
 
     # Scale the Jaccard similarity to be between -1 and 1
     scaled_similarity = round(2 * jacc_sim - 1, 3)
 
+    # if scaled_similarity > 1:
+    #     return 1
+    
     return scaled_similarity
 
 

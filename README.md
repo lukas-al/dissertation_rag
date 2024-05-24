@@ -1,5 +1,20 @@
 # structured_rag
 Try and fix the knowledge management issues within MA and the Bank of England.
+
+
+# To-Do list
+- Get the chain working with the web service
+- **Finish all documents for submission**
+
+To do detail:
+- Split the documents into appropriately sized nodes 
+    - Make sure the algo and all works the same once docs are nodes
+    - This is so that the QA LLM can parse the nodes rather than cutting them off.
+- Figure out how to fit the metadata into the context window with the node splitter
+- Modify the ONS code to have a different Pydantic parser layout so that we actually get useful responses from the LLM.
+    - Need to understand the pydantic parser class for this
+
+
 ## Overview
 See the project initiation document if you're interested...
 
@@ -19,6 +34,8 @@ At first instance, we're going to do Version 1 (external publications on webiste
 - I could do MPR to MPR, but the external publications don't map so well to that.
 - Instead, I'm just going to do a full quarter.
 - The date to use could be `2023 March - June` (incl. the MPR)
+
+```HAVE BASICALLY LOADED EVERYTHING IN JANUARY 2020```
 
 What about which content to use?
 | Type | Notes | Included? | N |
@@ -58,3 +75,5 @@ Interesting question:
 Another Idea:
 - Overloading the embedding with metadata - put it all into the document text and embed that entirely at once.
 - Does this deal with blanks better? Does it deal with nulls better.
+
+---

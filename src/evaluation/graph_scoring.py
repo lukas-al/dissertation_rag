@@ -98,7 +98,7 @@ def quick_stats(graph: nx.Graph) -> Dict[AnyStr, Any]:
     Returns:
         dict: A dictionary containing the calculated statistics.
     """
-    print("Calculating quick stats")
+    # print("Calculating quick stats")
 
     stats = {}
 
@@ -136,7 +136,7 @@ def simple_stats(graph: nx.Graph) -> Dict[AnyStr, Any]:
         - edge_connectivity: The edge connectivity of the graph.
         - node_connectivity: The node connectivity of the graph.
     """
-    print("Calculating simple stats")
+    # print("Calculating simple stats")
     stats = {}
 
     stats["number_of_nodes"] = nx.number_of_nodes(graph)
@@ -169,7 +169,7 @@ def attribute_stats(graph: nx.Graph) -> Dict[AnyStr, Any]:
     Returns:
         dict: A dictionary containing various statistics calculated based on the attributes of the graph.
     """
-    print("Calculating attribute stats")
+    # print("Calculating attribute stats")
     stats = {}
 
     stats["degree_assortativity"] = nx.degree_assortativity_coefficient(graph)
@@ -196,8 +196,9 @@ def community_detection(graph: nx.Graph) -> Dict[AnyStr, Any]:
         Dict[str, Any]: A dictionary containing the following statistics:
             - 'num_communities': The number of communities detected.
             - 'communities': The list of communities detected as sets of node ids.
+            - 'community_modularity': The modularity of our communities
     """
-    print("Calculating community detection")
+    # print("Calculating community detection")
     stats = {}
 
     communities = nx.community.greedy_modularity_communities(graph)
@@ -222,7 +223,7 @@ def node_classification(
     Returns:
         Dict[AnyStr, Any]: A dictionary containing the evaluation statistics for the node classification task.
     """
-    print("Calculating node classification")
+    # print("Calculating node classification")
     stats = {}
 
     node_class_preds_lclglbl = (

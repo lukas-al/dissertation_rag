@@ -9,9 +9,11 @@ import re
 import PyPDF2
 from fuzzywuzzy import fuzz
 from collections import Counter
-import fitz
-from llama_index.core.schema import Document
+import pymupdf
+
+from llama_index.core.schema import Document, BaseNode
 from llama_index.core import SimpleDirectoryReader
+from llama_index.core.node_parser import TokenTextSplitter
 from pathlib import Path
 
 
@@ -107,37 +109,37 @@ def match_notes_metadata(file_path: str, metadata_df: pd.DataFrame) -> Dict[str,
     return matched_metadata
 
 
-def get_random_metadata(file_path: str) -> Dict[str, Union[int, Dict[str, int]]]:
-    """Dummy function to demonstrate how we could extract extra
-    metadata from the text. We're going to need to make this
-    much more sophisticated.
+# def get_random_metadata(file_path: str) -> Dict[str, Union[int, Dict[str, int]]]:
+#     """Dummy function to demonstrate how we could extract extra
+#     metadata from the text. We're going to need to make this
+#     much more sophisticated.
 
-    Args:
-        file_path (str): absolute file path to the pdf
+#     Args:
+#         file_path (str): absolute file path to the pdf
 
-    Returns:
-        dict: collection of random metadata
-    """
-    random_metadata = {}
-    # Read the document and extract metadata as a dictionary
-    with open(file_path, "rb") as file:
-        pdf_reader = PyPDF2.PdfReader(file)
+#     Returns:
+#         dict: collection of random metadata
+#     """
+#     random_metadata = {}
+#     # Read the document and extract metadata as a dictionary
+#     with open(file_path, "rb") as file:
+#         pdf_reader = PyPDF2.PdfReader(file)
 
-        # Get the number of characters in the pdf
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-        random_metadata["num_characters"] = len(text)
+#         # Get the number of characters in the pdf
+#         text = ""
+#         for page in pdf_reader.pages:
+#             text += page.extract_text()
+#         random_metadata["num_characters"] = len(text)
 
-        # Get the number of words in the pdf
-        words = text.split()
-        random_metadata["num_words"] = len(words)
+#         # Get the number of words in the pdf
+#         words = text.split()
+#         random_metadata["num_words"] = len(words)
 
-        # Get the most common 5 words in the pdf
-        word_counts = Counter(words)
-        random_metadata["most_common_words"] = dict(word_counts.most_common(5))
+#         # Get the most common 5 words in the pdf
+#         word_counts = Counter(words)
+#         random_metadata["most_common_words"] = dict(word_counts.most_common(5))
 
-    return random_metadata
+#     return random_metadata
 
 
 def extract_links_from_pdf(file_path) -> List[str]:
@@ -151,7 +153,7 @@ def extract_links_from_pdf(file_path) -> List[str]:
         list: A list of extracted links from the PDF file.
     """
     # Open the PDF file
-    doc = fitz.open(file_path)
+    doc = pymupdf.open(file_path)
 
     links = []
 
@@ -184,11 +186,15 @@ def get_metadata(file_path: str) -> Dict[str, str]:
 
     # Match and extract some other metadata
     matched_metadata = match_notes_metadata(file_path, metadata_df)
-    random_metadata = get_random_metadata(file_path)
+    # random_metadata = get_random_metadata(file_path)
     link_list = extract_links_from_pdf(file_path)
 
     # Combine into a single dictionary
-    total_metadata = {**matched_metadata, **random_metadata, "links": link_list}
+    total_metadata = {
+        **matched_metadata, 
+        # **random_metadata, 
+        "links": link_list
+    }
 
     # Convert all metadata to strings for consistency
     total_metadata = {k: str(v) for k, v in total_metadata.items()}
@@ -196,12 +202,12 @@ def get_metadata(file_path: str) -> Dict[str, str]:
     return total_metadata
 
 
-def load_documents() -> List[Document]:
+def load_documents(num_files_limit=None, chunk_size: int = 1024) -> List[BaseNode]:
     """Wrapper function to read in the documents and metadata,
     and return the output index list object.
 
     Returns:
-        List[Document]: Our index of documents, as a list.
+        List[Nodes]: Our index of documents, as a list.
     """
     # Get the path of the current file
     current_path = Path(__file__)
@@ -210,7 +216,38 @@ def load_documents() -> List[Document]:
     path_to_docs = current_path.parent.parent.parent / "data/01_raw"
 
     doc_list = SimpleDirectoryReader(
-        path_to_docs, file_metadata=get_metadata
+        path_to_docs, file_metadata=get_metadata, num_files_limit=num_files_limit
     ).load_data()
+    
+    # ! TODO: CHECK IF THIS WORKS OR NOT
+    # Split the documents into appropriately sized nodes
+    node_list = TokenTextSplitter(
+        separator=" ",
+        chunk_size=chunk_size,
+        chunk_overlap=20,
+        backup_separators=["\n"],
+    ).get_nodes_from_documents(doc_list)
 
-    return doc_list
+    return node_list
+
+
+def doc_node_limiter(doc_list, chunk_size: int = 512):
+
+    text_splitter = TokenTextSplitter(
+        seperator=" ",
+        chunk_size=chunk_size,
+        chunk_overlap="20",
+        backup_separators=["\n"],
+    )
+
+    for doc in doc_list:
+        nodes = text_splitter(doc.text)
+
+        if len(nodes) > 1:
+            pass
+    
+    # node_parse = SimpleNodeParser.from_defaults(text_splitter=text_splitter)
+
+    raise NotImplementedError
+    
+
