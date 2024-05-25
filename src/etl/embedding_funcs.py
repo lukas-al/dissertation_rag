@@ -26,7 +26,7 @@ def embed_index(document_index: List[Document]) -> List[Document]:
     #! Or perhaps a
 
     # Load the SentenceTransformer model
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer("/Users/lukasalemu/Documents/00. Bank of England/00. Degree/Dissertation/structured-rag/models/all-MiniLM-L6-v2")
 
     with tqdm(total=len(document_index), desc="Embedding Documents") as pbar:
         for doc in document_index:

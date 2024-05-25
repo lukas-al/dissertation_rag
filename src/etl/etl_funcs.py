@@ -9,7 +9,7 @@ import re
 import PyPDF2
 from fuzzywuzzy import fuzz
 from collections import Counter
-import fitz
+import pymupdf
 from llama_index.core.schema import Document
 from llama_index.core import SimpleDirectoryReader
 from pathlib import Path
@@ -151,7 +151,7 @@ def extract_links_from_pdf(file_path) -> List[str]:
         list: A list of extracted links from the PDF file.
     """
     # Open the PDF file
-    doc = fitz.open(file_path)
+    doc = pymupdf.open(file_path)
 
     links = []
 
@@ -196,7 +196,7 @@ def get_metadata(file_path: str) -> Dict[str, str]:
     return total_metadata
 
 
-def load_documents() -> List[Document]:
+def load_documents(num_files_limit: int=2) -> List[Document]:
     """Wrapper function to read in the documents and metadata,
     and return the output index list object.
 
@@ -210,7 +210,7 @@ def load_documents() -> List[Document]:
     path_to_docs = current_path.parent.parent.parent / "data/01_raw"
 
     doc_list = SimpleDirectoryReader(
-        path_to_docs, file_metadata=get_metadata
+        path_to_docs, file_metadata=get_metadata, num_files_limit=num_files_limit,
     ).load_data()
 
     return doc_list

@@ -16,7 +16,7 @@ def main():
     curr_date = datetime.now().strftime("%Y-%m-%d")
     
     # load and embed the documents
-    document_index = etl_funcs.load_documents()
+    document_index = etl_funcs.load_documents(num_files_limit=2)
     embedded_index = embedding_funcs.embed_index(document_index)
     
     # v0 algorithm
