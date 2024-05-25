@@ -17,7 +17,7 @@ v5 employs regex to do named entity recognition, number matching, and link extra
 from llama_index.core.schema import Document
 from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple
-
+from sklearn.preprocessing import RobustScaler
 
 class V5Retriever(AbstractRetriever):
     """
@@ -159,3 +159,30 @@ class V5Retriever(AbstractRetriever):
             return 0.0
 
         return intersection / union
+
+    
+    def scale_adj_matrix(self, vector_dict):
+        """Take the dict with vectors of weights calcd elsewhere and apply a pca weighting to them.
+
+        Args:
+            adj_dict (_type_): _description_
+        """
+        # Fit the PCA on the data
+        distance_vectors = []
+
+        for key, nested_dict in vector_dict.items():
+            for key2, weight_dict in nested_dict.items():
+                distance_vectors.append(weight_dict["weight"])
+
+        # Fit the scaler
+        scaler = RobustScaler().fit(distance_vectors)
+
+        # Apply the pca to each item
+        scaled_vector_dict = vector_dict.copy()
+
+        for doc1, nested_dict in vector_dict.items():
+            for doc2, weight_dict in nested_dict.items():
+                scaled_vector_dict[doc1][doc2]["weight"] = scaler.transform([weight_dict["weight"]])[0]
+
+                
+        return scaled_vector_dict
