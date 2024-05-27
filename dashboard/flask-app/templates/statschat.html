@@ -1,0 +1,90 @@
+{% extends 'srag_layout.html' %}
+
+{% block results %}
+
+{% if results %}
+<!-- Main content section -->
+<main id="main" role="main" tabindex="-1">
+    <div class="ons-container search__container">
+        <div class="ons-grid">
+            <div class="ons-grid__col ons-col-12@m">
+                <section role="contentinfo" aria-label="Search results">
+                    <div class="search__results">
+                        <div id="results">
+                            <section class="search__summary" role="contentinfo" aria-label="Search summary" style="display:inline;">
+                                <div class="secondary-nav" style="display:inline;justify-content:right;"></div>
+                                    <i class="glyphicon glyphicon-thumbs-up feedback-up" style="font-size:24px;color:grey;" id="thumbs-up-ico"></i>
+                                    <i class="glyphicon glyphicon-thumbs-down feedback-down" style="font-size:24px;color:grey;" id="thumbs-down-ico"></i>
+                                    <input type="text" placeholder="Enter feedback comment." style="display:none;" id="feedback-send-input">
+                                    <span class="feedback-send" style="display:none;" id="feedback-send-icon"> Send</span>
+                                    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+                                    <script src="{{ url_for('static',filename='js/rating.js') }}"></script>
+                                </div>
+                                <div aria-live="polite">
+                                    Your question:
+                                    <h4 class="ons-u-fs-l">{{ question }}</h4>
+                                </div>
+                                <div aria-live="polite">
+                                    Your selected document:
+                                    <!-- <h4 class="ons-u-fs-xxl">{{selected_document}}</h4> -->
+                                    <h4 class="ons-u-fs-l">{{ selected_document }}</h4>
+                                </div>
+                                <div aria-live="polite" pb-5>
+                                    Your summarised answer:
+                                </div>
+                            </section>
+                            
+                            <section role="contentinfo" aria-label="Search results">
+                                <div class="ons-u-fs-l" id="answer_static">
+                                    {{results['answer']|safe}}
+                                </div>
+                            
+                                {% if results['references']|length > 0 %}
+                                                                
+                                <h2 class="display-5">Most relevant document nodes:</h2>
+
+                                <ul class="flush--padding">
+                                    {% for row in results['references'] %}
+                                    <li class="search__results__item">
+                                        <h3>Document Name: {{ row['metadata']['title'] }}</h3>
+                                        <p class="search__results__meta font-size--16">
+                                            <b>Released on:</b> {{ row['metadata']['doc_date'] }} &nbsp; | &nbsp;
+                                            <!-- <b>Section: </b> <a href="{{row['section_url']}}">{{ row['section'] }}</a> &nbsp; | &nbsp; -->
+                                            <b>Semantic distance: </b> {{ row['metadata']['doc_difference'] }}
+                                        </p>
+                                        <p class="search__results__summary font-size--16">
+                                            <b>Context:</b> {{ row['page_content']|safe }}
+                                        </p>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p class="search__results__summary font-size--16">
+                                    No relevant publications found.
+                                </p>
+                                {% endif %}
+                            </section>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+
+{% else %}
+<section>
+    <p>
+        This is a demo for the Structured RAG system <br>
+        The current data is highly limited and the LLM is not particularly trustworthy. <br>
+        <b>Proceed with caution.</b> <br>
+    </p>
+</section>
+
+{% endif %}
+
+{% endblock %}

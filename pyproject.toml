@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+
+[metadata]
+name = "StructuredRag"
+version = "0.1.1"
+
+[options]
+packages = { find = true }
+package_dir = { "" = "src" }
+
+install_requires = [
+    "llama_index",
+    "sentence_transformers",
+    "networkx",
+    "scikit-learn",
+    "numpy",
+    "hyperopt",
+    "fastbm25",
+    "pymupdf",
+    "fuzzywuzzy",
+    "python-Levenshtein",
+    "pandas",
+    "spacy",
+    "langchain",
+    "langchain_community"
+]
