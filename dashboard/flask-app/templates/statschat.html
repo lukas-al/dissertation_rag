@@ -41,28 +41,33 @@
                             
                                 {% if results['references']|length > 0 %}
                                                                 
-                                <h2 class="display-5">Most relevant document nodes:</h2>
-
-                                <ul class="flush--padding">
-                                    {% for row in results['references'] %}
-                                    <li class="search__results__item">
-                                        <h3>Document Name: {{ row['metadata']['title'] }}</h3>
-                                        <p class="search__results__meta font-size--16">
-                                            <b>Released on:</b> {{ row['metadata']['doc_date'] }} &nbsp; | &nbsp;
-                                            <!-- <b>Section: </b> <a href="{{row['section_url']}}">{{ row['section'] }}</a> &nbsp; | &nbsp; -->
-                                            <b>Semantic distance: </b> {{ row['metadata']['doc_difference'] }}
-                                        </p>
-                                        <p class="search__results__summary font-size--16">
-                                            <b>Context:</b> {{ row['page_content']|safe }}
-                                        </p>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                                {% else %}
-                                <p class="search__results__summary font-size--16">
-                                    No relevant publications found.
-                                </p>
-                                {% endif %}
+                                <!-- <h2 class="display-5">Most relevant document nodes:</h2> -->
+                                
+                                <div aria-live="polite">
+                                    Most relevant document nodes:
+                                    
+                                    <ul class="flush--padding">
+                                        {% for row in results['references'] %}
+                                        <li class="search__results__item">
+                                            <h3>Document Name: {{ row['metadata']['title'] }}</h3>
+                                            <p class="search__results__meta font-size--16">
+                                                <b>Released on:</b> {{ row['metadata']['doc_date'] }} &nbsp; | &nbsp;
+                                                <!-- <b>Section: </b> <a href="{{row['section_url']}}">{{ row['section'] }}</a> &nbsp; | &nbsp; -->
+                                                <b>Semantic distance: </b> {{ row['metadata']['doc_difference'] }}
+                                            </p>
+                                            <p class="search__results__summary font-size--16">
+                                                <b>Context:</b> {{ row['page_content']|safe }}
+                                            </p>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    
+                                    {% else %}
+                                    <p class="search__results__summary font-size--16">
+                                        No relevant publications found.
+                                    </p>
+                                    {% endif %}
+                                </div>
                             </section>
 
                         </div>

@@ -1,0 +1,91 @@
+{% extends 'srag_layout.html' %}
+
+{% block results %}
+
+{% if results %}
+
+<main id="main" role="main" tabindex="-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <!-- <i class="glyphicon glyphicon-thumbs-up feedback-up" style="font-size:24px;color:grey;" id="thumbs-up-ico"></i> -->
+                <svg id="thumbs-up-ico" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                </svg>
+
+                <!-- <i class="glyphicon glyphicon-thumbs-down feedback-down" style="font-size:24px;color:grey;" id="thumbs-down-ico"></i> -->
+                <svg id="thumbs-down-ico" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                </svg>
+                
+                <input type="text" placeholder="Enter feedback comment." style="display:none;" id="feedback-send-input">
+                <span class="feedback-send" style="display:none;" id="feedback-send-icon"> Send</span>
+                <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+                <script src="{{ url_for('static',filename='js/rating.js') }}"></script>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col pb-5" aria-live="polite">
+                Your question:
+                <h4 class="ons-u-fs-l">{{ question }}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col pb-5" aria-live="polite">
+                Your selected document:
+                <!-- <h4 class="ons-u-fs-xxl">{{selected_document}}</h4> -->
+                <h4 class="ons-u-fs-l">{{ selected_document }}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col pb-5" aria-live="polite">
+                Your summarised answer:
+                <h4 class="ons-u-fs-l">{{ results['answer']|safe }}</h4>
+            </div>
+        </div>
+
+        {% if results['references']|length > 0 %}
+
+        <div class="row">
+            <div class="col pb-5">
+                <h2> Most relevant document nodes: </h2>
+                <ul class="flush--padding">
+                    {% for row in results['references'] %}
+                    <li class="search__results__item">
+                        <h3>Document Name: {{ row['metadata']['title'] }}</h3>
+                        <p class="search__results__meta font-size--16">
+                            <b>Released on:</b> {{ row['metadata']['doc_date'] }} &nbsp; | &nbsp;
+                            <!-- <b>Section: </b> <a href="{{row['section_url']}}">{{ row['section'] }}</a> &nbsp; | &nbsp; -->
+                            <b>Semantic distance: </b> {{ row['metadata']['doc_difference'] }}
+                        </p>
+                        <p class="search__results__summary font-size--16">
+                            <b>Context:</b> {{ row['page_content']|safe }}
+                        </p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        {% else %}
+        <p class="search__results__summary font-size--16">
+            No relevant publications found.
+        </p>
+        {% endif %}
+    </div>
+</main>
+
+{% else %}
+
+<section>
+    <p>
+        This is a demo for the Structured RAG system <br>
+        The current dataset is highly limited and the language model is not particularly trustworthy. <br>
+        <b>Proceed with caution.</b> <br>
+    </p>
+</section>
+
+{% endif %}
+
+{% endblock %}

@@ -27,7 +27,7 @@ def retrieve_top_k(
     """
 
     # Instantiate embedding model to be used @TODO: Move this to a config file
-    embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+    embed_model = SentenceTransformer("sentence-transformers/multi-qa-mpnet-base-dot-v1")
 
     # Create a list to store the similarity scores and document ids
     similarity_scores = []

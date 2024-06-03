@@ -202,7 +202,7 @@ def get_metadata(file_path: str) -> Dict[str, str]:
     return total_metadata
 
 
-def load_documents(num_files_limit=None, chunk_size: int = 128) -> List[BaseNode]:
+def load_documents(num_files_limit=None, chunk_size: int = 256) -> List[BaseNode]:
     """Wrapper function to read in the documents and metadata,
     and return the output index list object.
 
@@ -224,7 +224,7 @@ def load_documents(num_files_limit=None, chunk_size: int = 128) -> List[BaseNode
     node_list = TokenTextSplitter(
         separator=" ",
         chunk_size=chunk_size,
-        chunk_overlap=20,
+        chunk_overlap=25,
         backup_separators=["\n"],
     ).get_nodes_from_documents(doc_list)
 

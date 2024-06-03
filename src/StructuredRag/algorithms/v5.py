@@ -19,6 +19,7 @@ from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple
 from sklearn.preprocessing import RobustScaler
 
+from numpy import array
 
 class V5Retriever(AbstractRetriever):
     """
@@ -174,7 +175,7 @@ class V5Retriever(AbstractRetriever):
                 distance_vectors.append(weight_dict["weight"])
 
         # Fit the scaler
-        scaler = RobustScaler().fit(distance_vectors)
+        scaler = RobustScaler().fit(array(distance_vectors).reshape(-1, 1))
 
         # Apply the pca to each item
         scaled_vector_dict = vector_dict.copy()

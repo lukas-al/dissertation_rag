@@ -10,6 +10,7 @@ from datetime import date
 from langchain.prompts.prompt import PromptTemplate
 
 from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import util
 from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from langchain.docstore.document import Document
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
@@ -94,16 +95,18 @@ class StructRAGInquirer():
         embedded_query, 
         source_document
     ):
-        
-        # overwrite for testing
-        source_document = 'monetary policy report february 2024.pdf'
+        print("SOURCE DOCUMENT IS", source_document)
+
         sim_scores = {}
         for doc in self.embedded_index:
+            # print(doc.metadata["file_name"].split("/")[-1])
             if doc.metadata["file_name"].split("/")[-1] == source_document:
-                sim_scores[doc.id_] = cosine_similarity(embedded_query.reshape(1, -1), np.array(doc.embedding).reshape(1, -1))[0][0]
+                print('HELLO FOUND MATCH')
+                # sim_scores[doc.id_] = cosine_similarity(embedded_query.reshape(1, -1), np.array(doc.embedding).reshape(1, -1))[0][0]
+                sim_scores[doc.id_] = float(util.dot_score(embedded_query, doc.embedding))
 
         if len(sim_scores) == 0:
-            raise ValueError("No document found with the specified name")
+            raise ValueError("No data returned from similar nodes")
         
         doc_similarity = dict(sorted(sim_scores.items(), key=lambda x: x[1], reverse=True))
 

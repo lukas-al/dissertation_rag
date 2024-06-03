@@ -19,7 +19,8 @@ logging.basicConfig(
 )
 
 inquirer = StructRAGInquirer(
-    path_to_experiment='/Users/lukasalemu/Documents/00. Bank of England/00. Degree/Dissertation/structured-rag/results/v0/2024-05-27',
+    # path_to_experiment='/Users/lukasalemu/Documents/00. Bank of England/00. Degree/Dissertation/structured-rag/results/v0/2024-05-28',
+    path_to_experiment=r'N:\CECD\10. Personal\Lukas Alemu\Study Repository\99. Capstone\dissertation_rag\results\v0\2024-05-28',
     llm_name='google/flan-t5-large',
     llm_max_tokens=512,
 )
@@ -62,7 +63,7 @@ async def search(
     selected_document: Optional[str] = None, 
     debug: bool = True,
 ):
-    
+    print('Selected doc is', selected_document)  
     response = inquirer.run_inquirer(
         query=q,
         source_document_name=selected_document,

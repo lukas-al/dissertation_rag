@@ -8,6 +8,7 @@ import numpy as np
 import networkx as nx
 from datetime import date
 from langchain.prompts.prompt import PromptTemplate
+from sentence_transformers import util
 
 from sklearn.metrics.pairwise import cosine_similarity
 from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
@@ -90,7 +91,10 @@ class StructRAGInquirer():
         sim_scores = {}
         for doc in self.embedded_index:
             if doc.metadata["file_name"].split("/")[-1] == source_document:
-                sim_scores[doc.id_] = cosine_similarity(embedded_query.reshape(1, -1), np.array(doc.embedding).reshape(1, -1))[0][0]
+                # Cosine sim
+                # sim_scores[doc.id_] = cosine_similarity(embedded_query.reshape(1, -1), np.array(doc.embedding).reshape(1, -1))[0][0]
+                # Dot product
+                sim_scores[doc.id_] = float(util.dot_score(embedded_query, doc.embedding))
 
         doc_similarity = dict(sorted(sim_scores.items(), key=lambda x: x[1], reverse=True))
 

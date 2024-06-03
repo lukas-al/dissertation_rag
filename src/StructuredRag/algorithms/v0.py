@@ -7,7 +7,7 @@ from typing import List, Tuple
 from llama_index.core.schema import Document
 from sklearn.metrics.pairwise import cosine_similarity
 from numpy import array
-
+from sentence_transformers import util
 
 class V0Retriever(AbstractRetriever):
     """
@@ -55,8 +55,17 @@ class V0Retriever(AbstractRetriever):
         Returns:
         float: The similarity score between the two documents.
         """
-        sim_score = cosine_similarity(
-            array(doc1.embedding).reshape(1, -1), array(doc2.embedding).reshape(1, -1)
-        )[0][0]
+        # For cosine_similarity
+        # sim_score = cosine_similarity(
+        #     array(doc1.embedding).reshape(1, -1), array(doc2.embedding).reshape(1, -1)
+        # )[0][0]
+
+        # For dot product
+        sim_score = float(
+            util.dot_score(
+                doc1.embedding, 
+                doc2.embedding
+            )
+        )
 
         return sim_score

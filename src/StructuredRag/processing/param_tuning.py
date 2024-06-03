@@ -33,8 +33,8 @@ def tune_edgethresh(adj_mat, embedded_index) -> float:
         best_params = hyperopt.fmin(
             fn=partial(objective, adj_mat, embedded_index),
             space=search_space,
-            algo=hyperopt.tpe.suggest,
-            max_evals=100,
+            algo=hyperopt.atpe.suggest,
+            max_evals=25,
             trials=trials,
         )
 

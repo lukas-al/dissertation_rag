@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from Levenshtein import ratio
 from pandas import to_datetime
 from fuzzywuzzy import fuzz, process
+from sentence_transformers import util
 import re
 
 # from sentence_transformers import SentenceTransformer
@@ -34,9 +35,14 @@ def node_name_distance(doc0, doc1) -> float:
     # doc0_emb = embed_model.encode(doc0_name)
     # doc1_emb = embed_model.encode(doc1_name)
 
-    semantic_sim = cosine_similarity(
-        np.array(doc0_emb).reshape(1, -1), np.array(doc1_emb).reshape(1, -1)
-    )[0][0]
+    # For cosine similarity
+    # semantic_sim = cosine_similarity(
+    #     np.array(doc0_emb).reshape(1, -1), np.array(doc1_emb).reshape(1, -1)
+    # )[0][0]
+
+    semantic_sim = float(util.dot_score(
+        doc0_emb, doc1_emb
+    ))
 
     # syntactic_similarity:
     syntactic_sim = ratio(doc0_name, doc1_name)
@@ -56,9 +62,15 @@ def node_text_distance(doc0, doc1) -> float:
         float: the distance between the two nodes
     """
 
-    sim_score = cosine_similarity(
-        np.array(doc0.embedding).reshape(1, -1), np.array(doc1.embedding).reshape(1, -1)
-    )[0][0]
+    # Cosine sim models
+    # sim_score = cosine_similarity(
+    #     np.array(doc0.embedding).reshape(1, -1), np.array(doc1.embedding).reshape(1, -1)
+    # )[0][0]
+
+    # Dot product models
+    sim_score = float(util.dot_score(
+        doc0.embedding, doc1.embedding
+    ))
 
     return round(sim_score, 3)
 
@@ -83,9 +95,15 @@ def description_distance_metric(doc0, doc1):
     doc0_emb = doc0.metadata["embedded_description"]
     doc1_emb = doc1.metadata["embedded_description"]
 
-    dist_score = cosine_similarity(
-        np.array(doc0_emb).reshape(1, -1), np.array(doc1_emb).reshape(1, -1)
-    )[0][0]
+    # Cosine sim
+    # dist_score = util.dot_product(
+    #     np.array(doc0_emb).reshape(1, -1), np.array(doc1_emb).reshape(1, -1)
+    # )[0][0]
+
+    # Dot product
+    dist_score = float(util.dot_score(
+        doc0_emb, doc1_emb
+    ))
 
     return round(dist_score, 3)
 

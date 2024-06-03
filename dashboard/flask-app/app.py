@@ -40,6 +40,7 @@ def home():
     try:
         session["selected_document"]
     except KeyError:
+        print('KEY ERROR IN FLASK')
         session["selected_document"] = 'Please select a document from the list.'
 
     if session["selected_document"] == 'None':
@@ -47,7 +48,8 @@ def home():
 
     browser_response = make_response(
         render_template(
-            "statschat.html", 
+            # "statschat.html",
+            "srag_result.html",
             latest_filter=session["latest_filter"],
             question="",
             document_data=doc_data,
@@ -57,7 +59,7 @@ def home():
     
     return browser_response
 
-@app.route("/selectDocument", methods=['POST'])
+@app.route("/selectDocument", methods=["POST"])
 def select_document_post():
     
     # Get the arguments from the form
@@ -103,7 +105,8 @@ def search():
     # Fill in our response
     browser_response = make_response(
         render_template(
-            "statschat.html",
+            # "statschat.html",
+            "srag_result.html",
             latest_filter=session["latest_filter"],
             question=session["question"],
             results=results,
@@ -131,4 +134,4 @@ def record_rating():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8081, debug=False)
+    app.run(host="0.0.0.0", port=8081, debug=True)

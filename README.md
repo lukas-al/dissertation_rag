@@ -3,8 +3,15 @@ Try and fix the knowledge management issues within MA and the Bank of England.
 
 
 # To-Do list
-- Get the chain working with the web service
-- **Finish all documents for submission**
+
+- Get a narrative going
+    - Bring in data from a bunch of different time periods
+    - Construct examples of performance differences
+
+- Search is somewhat ok as you can filter
+- RAG is worse as it leads to confusion
+
+- Stuff the document with the metadata
 
 To do detail:
 - Split the documents into appropriately sized nodes 

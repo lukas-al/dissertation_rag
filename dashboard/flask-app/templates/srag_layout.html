@@ -53,18 +53,19 @@ The template consists of a header, main content section, and footer.
         </div>
 
         <!-- Select document submit -->
-        <div class="row justify-content-start">
-            <form action="/selectDocument" method="POST"></form>
-                <div class="col pb-3">
-                    <div class="form-select-" aria-label="Select Document">
+        <div class="row align-items-center">
+            <div class="col">
+                <form action="/selectDocument" method="POST">
+                    <div class="input-group mb-3">
                         <select class="form-select" id="documentSelect" name="selected_document">
                             {% for item in document_data %}
                                 <option value="{{ item }}">{{ item }}</option>
                             {% endfor %}
                         </select>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
 
         <!-- Document submit display -->
@@ -80,11 +81,11 @@ The template consists of a header, main content section, and footer.
             </div>
         </div>
 
-        <row justify-content-start>
+        <div class="row justify-content-start">
             <div class="col">
                 <h4>Please, type your question in the search field</h4>
             </div>
-
+        </div>
         <!-- Search bar -->
         <div class="row align-items-center">
             <div class="col">

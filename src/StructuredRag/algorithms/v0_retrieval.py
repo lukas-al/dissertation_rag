@@ -3,6 +3,7 @@
 from typing import List, Tuple
 from llama_index.core.schema import Document
 from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import util
 from StructuredRag.etl.embedding_funcs import embed_query
 from numpy import array
 
@@ -31,10 +32,16 @@ def retrieve_top_k_query(
     # Iterate over the documents in the index
     for doc in doc_index:
         # Calculate the cosine similarity between the query embedding and document embedding
-        doc_embed_rshp = array(doc.embedding).reshape(1, -1)
-        similarity_score = cosine_similarity(
-            query_embedding.reshape(1, -1), doc_embed_rshp
-        )
+        # doc_embed_rshp = array(doc.embedding).reshape(1, -1)
+        # similarity_score = cosine_similarity(
+        #     query_embedding.reshape(1, -1), doc_embed_rshp
+        # )
+
+        # For dot score models
+        similarity_score = float(util.dot_score(
+            query_embedding, doc.embedding
+        ))
+
         # Append the similarity score and document id to the list
         similarity_scores.append((doc.id_, similarity_score))
 
@@ -70,9 +77,9 @@ def retrieve_top_k(
     for doc in doc_index:
         # Calculate the cosine similarity between the query embedding and document embedding
         doc_embed_rshp = array(doc.embedding).reshape(1, -1)
-        similarity_score = cosine_similarity(
-            query_embedding.reshape(1, -1), doc_embed_rshp
-        )
+        similarity_score = float(util.dot_product(
+            query_embedding, doc_embed_rshp
+        ))
         # Append the similarity score and document id to the list
         similarity_scores.append((doc.id_, similarity_score))
 

@@ -1,6 +1,7 @@
 # Data
 *.pdf
 *.duckdb
+results/
 
 # Data organisation
 *.xlsx
@@ -16,3 +17,5 @@
 
 # Notebooks
 notebooks/dev/
+
+
