@@ -24,6 +24,7 @@ class StructRAGInquirer():
         path_to_experiment: str,
         llm_name: str = 'google/flan-t5-large',
         llm_max_tokens: int = 1024,
+        use_anchor_document: bool = True,
     ):
         # Read the data for the specified experiment
         data = {}
@@ -43,7 +44,8 @@ class StructRAGInquirer():
             model_kwargs={
                 "max_length": llm_max_tokens,
             },
-        )     
+        )
+        self.use_anchor_document = use_anchor_document
         
     def run_inquirer(
         self,
@@ -95,13 +97,16 @@ class StructRAGInquirer():
         embedded_query, 
         source_document
     ):
-        print("SOURCE DOCUMENT IS", source_document)
 
         sim_scores = {}
-        for doc in self.embedded_index:
-            # print(doc.metadata["file_name"].split("/")[-1])
-            if doc.metadata["file_name"].split("/")[-1] == source_document:
-                print('HELLO FOUND MATCH')
+        
+        if self.use_anchor_document:
+            for doc in self.embedded_index:
+                if doc.metadata["file_name"].split("/")[-1] == source_document:
+                    # sim_scores[doc.id_] = cosine_similarity(embedded_query.reshape(1, -1), np.array(doc.embedding).reshape(1, -1))[0][0]
+                    sim_scores[doc.id_] = float(util.dot_score(embedded_query, doc.embedding))
+        else:
+            for doc in self.embedded_index:
                 # sim_scores[doc.id_] = cosine_similarity(embedded_query.reshape(1, -1), np.array(doc.embedding).reshape(1, -1))[0][0]
                 sim_scores[doc.id_] = float(util.dot_score(embedded_query, doc.embedding))
 
