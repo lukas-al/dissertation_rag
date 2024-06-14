@@ -18,4 +18,6 @@ results/
 # Notebooks
 notebooks/dev/
 
-
+# Other
+planning/
+*.png
