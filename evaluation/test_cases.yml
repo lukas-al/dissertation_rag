@@ -2,11 +2,95 @@
 # we'll go with this in terms of how to score this quantitively
 
 test_cases:
-  - question: "What is inflation"
-    answer: "Inflation is 2%"
+  - question: "What is inflation?"
+    anchor_document: "monetary policy report february 2024.pdf"
 
-  - question: "What is GDP"
-    answer: "GDP stands for Gross Domestic Product"
+  - question: "What is GDP?"
+    anchor_document: "monetary policy report february 2024.pdf"
     
-  - question: "What is AI"
-    answer: "AI stands for Artificial Intelligence"
+  - question: "What is the Monetary Policy Committee?"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What is the stance of Monetary Policy?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What decision did the MPC make?"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What information did the MPC use to make their decision?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the inflation target?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What are critical risks to the inflation outlook?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "How is the economy likely to evolve?"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What is the forecast for UK GDP?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the Monetary Transmission Mechanism?"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What are the key factors that will influence the MPC's decision?"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What is the MPC's assessment of the current economic situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What are the key risks to the MPC's forecast?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What information has been most influential in the MPC's decision?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the MPC's assessment of the current inflation situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What analysis has been done on the effect of exchange rates on inflation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What analysis has been done on the effect of house prices on inflation expectations?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What models are used for nowcasting?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "How is the MPC's decision likely to affect the economy?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "How is the Forecast constructed?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the current labour market situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the MPC's assessment of the current housing market situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the current global economic situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the current financial market situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the current business investment situation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What work has been done on the effect of the labour market on inflation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What key issues have been considered by the MPC?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What special topics have been considered by the MPC?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What is the near term outlook"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What is the medium term outlook"
+    anchor_document: "monetary policy report february 2024.pdf"
