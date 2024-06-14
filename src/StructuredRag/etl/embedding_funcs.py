@@ -29,7 +29,7 @@ def embed_index(document_index: List[Document]) -> List[Document]:
     # model = SentenceTransformer("/Users/lukasalemu/Documents/00. Bank of England/00. Degree/Dissertation/structured-rag/models/multi-qa-mpnet-base-dot-v1")
     model = SentenceTransformer("sentence-transformers/multi-qa-mpnet-base-dot-v1")
 
-    with tqdm(total=len(document_index), desc="Embedding Do5cuments") as pbar:
+    with tqdm(total=len(document_index), desc="Embedding Documents") as pbar:
         for doc in document_index:
             # Embed the document text
             doc.embedding = model.encode(doc.text).tolist()

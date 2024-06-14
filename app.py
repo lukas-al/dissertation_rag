@@ -19,26 +19,26 @@ def main():
     document_index = etl_funcs.load_documents(chunk_size=256)
     embedded_index = embedding_funcs.embed_index(document_index)
 
-    # # -------------------------------- # v0 algorithm # -------------------------------- #
-    # adj_matrix = graph_construction.construct_adjacency_dict_parallel(
-    #     embedded_index, v0.V0Retriever
-    # )
+    # -------------------------------- # v0 algorithm # -------------------------------- #
+    adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+        embedded_index, v0.V0Retriever
+    )
 
-    # # Calculate the optimal edge_thresh
-    # # edge_thresh = param_tuning.tune_edgethresh(adj_matrix, embedded_index)
+    # Calculate the optimal edge_thresh
+    edge_thresh = param_tuning.tune_edgethresh(adj_matrix, embedded_index)
 
-    # # persist the results
-    # persist_results.save_results(
-    #     experiment_type="v0",
-    #     uuid=curr_date,
-    #     persist_objects={
-    #         "embedded_index": embedded_index,
-    #         "adj_matrix": adj_matrix,
-    #         # "edge_thresh": edge_thresh,
-    #         # 'notes': "",
-    #         # "algorithm": v0.V0Retriever()
-    #     },
-    # )
+    # persist the results
+    persist_results.save_results(
+        experiment_type="v0",
+        uuid=curr_date,
+        persist_objects={
+            "embedded_index": embedded_index,
+            "adj_matrix": adj_matrix,
+            "edge_thresh": edge_thresh,
+            # 'notes': "",
+            # "algorithm": v0.V0Retriever()
+        },
+    )
 
     # # -------------------------------- # v1 algorithm # -------------------------------- #
     # adj_matrix = graph_construction.construct_adjacency_dict_parallel(
@@ -109,32 +109,32 @@ def main():
     #     },
     # )
 
-    # -------------------------------- # v5 algorithm # -------------------------------- #
-    unscaled_adj_matrix = graph_construction.construct_adjacency_dict_parallel(
-        embedded_index[:5],
-        v5.V5Retriever,
-        algo_type="v5",
-        spacy_model_name="en_core_web_sm",
-    )
+    # # -------------------------------- # v5 algorithm # -------------------------------- #
+    # unscaled_adj_matrix = graph_construction.construct_adjacency_dict_parallel(
+    #     embedded_index[:5],
+    #     v5.V5Retriever,
+    #     algo_type="v5",
+    #     spacy_model_name="en_core_web_sm",
+    # )
 
-    v5_instance = v5.V5Retriever(spacy_model="en_core_web_sm")
-    scaled_adj_matrix = v5_instance.scale_adj_matrix(unscaled_adj_matrix)
+    # v5_instance = v5.V5Retriever(spacy_model="en_core_web_sm")
+    # scaled_adj_matrix = v5_instance.scale_adj_matrix(unscaled_adj_matrix)
 
-    # Calculate the optimal edge_thresh
-    # edge_thresh = param_tuning.tune_edgethresh(scaled_adj_matrix, embedded_index)
+    # # Calculate the optimal edge_thresh
+    # # edge_thresh = param_tuning.tune_edgethresh(scaled_adj_matrix, embedded_index)
 
-    # persist the results
-    persist_results.save_results(
-        experiment_type="v6_TEST",
-        uuid=curr_date,
-        persist_objects={
-            "embedded_index": embedded_index,
-            "adj_matrix": scaled_adj_matrix,
-            "unscaled_adj_matrix": unscaled_adj_matrix,
-            # "edge_thresh": edge_thresh,
-            "notes": """spacy model: en_core_web_sm""",
-        },
-    )
+    # # persist the results
+    # persist_results.save_results(
+    #     experiment_type="v6_TEST",
+    #     uuid=curr_date,
+    #     persist_objects={
+    #         "embedded_index": embedded_index,
+    #         "adj_matrix": scaled_adj_matrix,
+    #         "unscaled_adj_matrix": unscaled_adj_matrix,
+    #         # "edge_thresh": edge_thresh,
+    #         "notes": """spacy model: en_core_web_sm""",
+    #     },
+    # )
 
 
 if __name__ == "__main__":
