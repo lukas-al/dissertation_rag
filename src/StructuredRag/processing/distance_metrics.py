@@ -48,7 +48,7 @@ def node_name_distance(doc0, doc1) -> float:
     syntactic_sim = ratio(doc0_name, doc1_name)
     syntactic_sim = 2 * (syntactic_sim - 0) / (1 - 0) - 1
 
-    return round(0.3 * syntactic_sim + 0.7 * semantic_sim, 3)  # Random weights
+    return round(0.5 * syntactic_sim + 0.5 * semantic_sim, 3)  # Random weights
 
 
 def node_text_distance(doc0, doc1) -> float:
@@ -112,8 +112,6 @@ def doctype_distance_metric(doc0, doc1):
     """
     Calculates the distance metric between two document types based on a knowledge graph.
 
-    #! @TODO: THE KNOWLEDGE GRAPH NEEDS UPDATING
-
     Parameters:
     - doc0 (Document): The first document.
     - doc1 (Document): The second document.
@@ -129,36 +127,28 @@ def doctype_distance_metric(doc0, doc1):
     doc_type1 = doc0.metadata["Type"]
     doc_type2 = doc1.metadata["Type"]
 
-    # ! When testing, there are only actually 3 types of document - background reading, essential reading, and recommended reading.
-    # ! This means we don't need this to be so complicated at all.
-
-    if doc_type1 == doc_type2:
-        return 1
-
-    else:
-        return -1
-
-    # This is hard coded in currently - could use a config file to define it.
     doc_knowledge_graph = {
-        "MPR": {"press release": 0.0, "research paper": 0.9, "speech": 0.6},
-        "press release": {"research paper": 0.9, "speech": 0.7},
-        "research paper": {"speech": 0.7},
-        "speech": {},
+        "Background Reading": {"Data Response": 0.5, "Essential Reading": 0.3, "Monetary Policy Report": 0.0, "Recommended reading": 0.8, "Speech": 0.7},
+        "Data Response": {"Essential Reading": 0.4, "Monetary Policy Report": 0.4, "Recommended reading": 0.8, "Speech": 0.0},
+        "Essential Reading": {"Monetary Policy Report": 0.7, "Recommended reading": 0.4, "Speech": 0.0},
+        "Monetary Policy Report": {"Recommended reading": 0.4, "Speech": 0.6},
+        "Recommended reading": {"Speech": 0.0},
     }
 
     # If the document types are the same, return 1
     if doc_type1 == doc_type2:
         return 1
 
-    # Check if the document types exist in the knowledge graph
-    if doc_type1 not in doc_knowledge_graph or doc_type2 not in doc_knowledge_graph:
-        raise ValueError("Document types not found in the knowledge graph")
-
-    # Get the distance from the knowledge graph
-    distance = doc_knowledge_graph[doc_type1].get(
-        doc_type2, doc_knowledge_graph[doc_type2].get(doc_type1)
-    )
-
+    try: 
+        distance = doc_knowledge_graph[doc_type1].get(
+            doc_type2
+        )
+    except:
+        # Reverse the order
+        distance = doc_knowledge_graph[doc_type2].get(
+            doc_type1
+        )
+    
     if distance is None:
         raise ValueError(
             "No path found between the document types in the knowledge graph"
@@ -247,6 +237,7 @@ def fuzzy_jaccard_similarity(set1, set2, threshold):
     Used in the author_distance_metric function to help with where
     I or anyone else might have made a typo in the author's name.
 
+    #Todo: Fix the outlier issue and perhaps use Dice Similarity Coefficient
     Parameters:
     set1 (str or list): The first set of strings.
     set2 (str or list): The second set of strings.
@@ -272,12 +263,6 @@ def fuzzy_jaccard_similarity(set1, set2, threshold):
                 intersection.add(el1)
 
     union = len(set1) + len(set2) - len(intersection)
-
-    # if union != 0:
-    #     if len(intersection) / union > 1:
-    #         print('---')
-    #         print(len(intersection) / union)
-    #         print(set1, '||' ,set2, '||', intersection)
 
     #! Add a dumb check for outliers. Not sure why they're occuring rn and cba to fix it.
     if len(intersection) / union > 1:

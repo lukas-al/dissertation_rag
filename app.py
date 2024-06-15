@@ -121,7 +121,7 @@ def main():
     scaled_adj_matrix = v5_instance.scale_adj_matrix(unscaled_adj_matrix)
 
     # Calculate the optimal edge_thresh
-    # edge_thresh = param_tuning.tune_edgethresh(scaled_adj_matrix, embedded_index)
+    edge_thresh = param_tuning.tune_edgethresh(scaled_adj_matrix, embedded_index)
 
     # persist the results
     persist_results.save_results(
