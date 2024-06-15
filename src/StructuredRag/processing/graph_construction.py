@@ -306,7 +306,7 @@ def construct_graph_from_adj_dict(adj_dict, edge_thresh, embedded_index) -> nx.G
         )
 
     # Add the edges
-    for node0, edge_bunch in adj_dict.items():
+    for node0, edge_bunch in tqdm(adj_dict.items(), desc="Adding edges to graph"):
         for node1, edge_weight in edge_bunch.items():
             if edge_weight["weight"] > edge_thresh:
                 graph.add_edge(node0, node1, weight=edge_weight["weight"])
