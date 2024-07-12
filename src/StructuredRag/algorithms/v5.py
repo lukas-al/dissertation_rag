@@ -87,7 +87,7 @@ class V5Retriever(AbstractRetriever):
         )
         link_score = self.calculate_link_similarity(doc1_links, doc2_links)
 
-        return (ner_score + link_score) / 2
+        return (0.8 * ner_score) + (0.2 * link_score)
 
     def extract_named_entities(self, doc: Document) -> List[str]:
         """Extract named entities from the document.
@@ -183,7 +183,7 @@ class V5Retriever(AbstractRetriever):
         for doc1, nested_dict in vector_dict.items():
             for doc2, weight_dict in nested_dict.items():
                 scaled_vector_dict[doc1][doc2]["weight"] = scaler.transform(
-                    [weight_dict["weight"]]
+                    array(weight_dict["weight"]).reshape(1, -1)
                 )[0]
 
         return scaled_vector_dict

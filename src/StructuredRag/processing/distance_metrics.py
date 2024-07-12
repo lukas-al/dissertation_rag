@@ -150,9 +150,10 @@ def doctype_distance_metric(doc0, doc1):
         )
     
     if distance is None:
-        raise ValueError(
-            "No path found between the document types in the knowledge graph"
-        )
+        return 0
+        # raise ValueError(
+        #     "No path found between the document types in the knowledge graph"
+        # )
 
     # Scale the distance to be between -1 and 1
     scaled_distance = round(2 * (distance - 0.5), 3)
