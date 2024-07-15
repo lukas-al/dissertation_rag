@@ -2,8 +2,49 @@
 Try and fix the knowledge management issues within MA and the Bank of England.
 
 
-# To-Do list
+# Narrative to construct
 
+### Having:
+1. Tested numerous embedding models
+	- miniLMV12
+	- multiqa-mpnet
+	- BAAI/bge-large-en-v1.5
+
+By manually scoring on some dataset of how similar we'd expect certain passages to be.
+
+2. Improved the pre-processing of the text
+	- Raw text
+	- Basic filtering
+
+Is there a way we can compare performance here?
+
+3. Tested multiple AG LLMs
+	- FLAN
+	- BGE / LLama2 / Mixtral flavours
+
+Is there a way we can compare performance here?
+
+### We then compared various RAG systems:
+1. Simple RAG LLM without Graph context
+2. LLM with Graph - embeddings only
+3. LLM with Graph - different methods 0-4
+ 
+### We scored the different RAG systems using:
+1. LLM-generated Question Answer couples, combining context with prompts.
+	- These are critiqued by another LLM to filter out bad questions and bad contexts.
+    - Then scored using another evaluation LLM to see how the RAG system performed.
+
+2. A manually constructed Question set with some needle-in-haystack queries for the LLM.
+    - Manually scored by 2 different individuals
+
+### Ultimately, we came to some conclusions on the uniqueness of this dataset and the performance of the RAG systems.
+1. TBD
+
+
+
+-----
+
+# Old todo
 - Get a narrative going
     - Bring in data from a bunch of different time periods
     - Construct examples of performance differences
