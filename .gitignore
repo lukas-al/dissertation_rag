@@ -21,3 +21,4 @@ notebooks/dev/
 # Other
 planning/
 *.png
+*.gguf
