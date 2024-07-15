@@ -8,6 +8,14 @@ from StructuredRag.utils import persist_results
 
 from datetime import datetime
 
+#! TODO: 
+#! Testing
+#! 1. Add some needle in haystack queries
+#! 
+#! Improve performance
+#! 2. Replace FLAN with a quantised model for the AG
+#! 3. Replace multiQA with a better embedding model - reduce dataset size if necessary !DONE - REPLACED IT WITH BGE LARGE
+#! 4. Pre-clean some of the text \n and random stuff, clean out stuff which is lots of numbers (if > 50% non alpha chars remove) !DONE - CLEANED OUT \n 
 
 def main():
     """
@@ -17,11 +25,11 @@ def main():
     curr_date = datetime.now().strftime("%Y-%m-%d")
 
     # load and embed the documents
-    # document_index = etl_funcs.load_documents(chunk_size=256)
+    # document_index = etl_funcs.load_documents(chunk_size=512)
     # embedded_index = embedding_funcs.embed_index(document_index)
 
     # Load the embedded index from the following path
-    with open(r"results\v4\2024-06-16\embedded_index.pickle", "rb") as f:
+    with open(r"results\v0\2024-07-12\embedded_index.pickle", "rb") as f:
         embedded_index = pickle.load(f)
     
     """
@@ -41,7 +49,7 @@ def main():
             "embedded_index": embedded_index,
             "adj_matrix": adj_matrix,
             "edge_thresh": edge_thresh,
-            # 'notes': "",
+            'notes': "using bge-large-en-v1.5 model for embedding",
             # "algorithm": v0.V0Retriever()
         },
     )
@@ -68,6 +76,7 @@ def main():
         },
     )
 
+    
     # -------------------------------- # v3 algorithm # -------------------------------- #
     adj_vectors = graph_construction.construct_adjacency_dict_parallel(
         embedded_index, v3.V3Retriever
@@ -140,10 +149,10 @@ def main():
             "adj_matrix": scaled_adj_matrix,
             "unscaled_adj_matrix": unscaled_adj_matrix,
             "edge_thresh": edge_thresh,
-            "notes": """spacy model: en_core_web_sm""",
+            "notes": "spacy model: en_core_web_sm",
         },
     )
-
+    
 
 if __name__ == "__main__":
     main()

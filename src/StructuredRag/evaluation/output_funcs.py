@@ -213,13 +213,13 @@ def create_human_eval_spreadsheet(
 
 if __name__ == "__main__":
     create_human_eval_spreadsheet(
-        wb_name="human_eval_test.xlsx",
+        wb_name="human_eval_test_bgemodel.xlsx",
         anchor_doc_flag=False,
         graph_paths=[
             "\\v0\\2024-06-15",
             '\\v1\\2024-06-16',
-            # '\\v3\\2024-05-28',
-            # '\\v4\\2024-05-28',
-            # '\\v5\\2024-05-19'
+            '\\v3\\2024-05-28',
+            '\\v4\\2024-05-28',
+            '\\v5\\2024-05-19'
         ],
     )

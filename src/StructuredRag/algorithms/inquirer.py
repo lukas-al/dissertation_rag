@@ -176,7 +176,7 @@ class StructRAGInquirer:
         _core_prompt = """
             ==Background==
             You are an AI assistant with a focus on helping to answer economists' search questions over particular documents. 
-            Your responses should use the information within the query to provide contextual information. 
+            Your responses should use the context included to provide contextual information. 
             It is important to maintain impartiality and non-partisanship. If you are unable to answer a question based on the given instructions, please indicate so.
             Your responses should be well-structured and professional, using British English.
         """
@@ -199,9 +199,8 @@ class StructRAGInquirer:
 
         _extractive_prompt = """
             ==TASK==
-            Your task is to extract and write an answer for the question based on the provided
-            contexts. If the question
-            cannot be answered from the information in the context, please do not provide an answer.
+            Your task is to extract and write an answer for the question based on the provided contexts. 
+            If the question cannot be answered from the information in the context, please do not provide an answer.
             If the context is not related to the question, please do not provide an answer.
 
             Question: {question}
@@ -226,8 +225,6 @@ class StructRAGInquirer:
         )
 
         _stuff_document_template = """
-            Doc Num: {doc_num} 
-
             {page_content}
         """
 

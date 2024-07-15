@@ -175,8 +175,8 @@ def scaled_date_difference(doc0, doc1):
 
     """
     # Try to convert the dates to datetime objects
-    date0 = to_datetime(doc0.metadata["Date"])
-    date1 = to_datetime(doc1.metadata["Date"])
+    date0 = to_datetime(doc0.metadata["Date"], dayfirst=True)
+    date1 = to_datetime(doc1.metadata["Date"], dayfirst=True)
 
     diff = (date0 - date1).days
 
