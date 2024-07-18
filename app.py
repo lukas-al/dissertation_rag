@@ -25,14 +25,14 @@ def main():
     curr_date = datetime.now().strftime("%Y-%m-%d")
 
     # load and embed the documents
-    # document_index = etl_funcs.load_documents(chunk_size=512)
-    # embedded_index = embedding_funcs.embed_index(document_index)
+    document_index = etl_funcs.load_documents(chunk_size=256)
+    embedded_index = embedding_funcs.embed_index(document_index)
 
     # Load the embedded index from the following path
-    with open(r"results\v0\2024-07-12\embedded_index.pickle", "rb") as f:
-        embedded_index = pickle.load(f)
+    # with open(r"results\v0\2024-07-12\embedded_index.pickle", "rb") as f:
+    #     embedded_index = pickle.load(f)
     
-    """
+    
     # -------------------------------- # v0 algorithm # -------------------------------- #
     adj_matrix = graph_construction.construct_adjacency_dict_parallel(
         embedded_index, v0.V0Retriever
@@ -54,7 +54,7 @@ def main():
         },
     )
     
-
+    """
     # -------------------------------- # v1 algorithm # -------------------------------- #
     adj_matrix = graph_construction.construct_adjacency_dict_parallel(
         embedded_index, v1.V1Retriever
@@ -124,8 +124,7 @@ def main():
             # "algorithm": v4.V4Retriever()
         },
     )
-    """
-
+    
     # -------------------------------- # v5 algorithm # -------------------------------- #
     unscaled_adj_matrix = graph_construction.construct_adjacency_dict_parallel(
         embedded_index,
@@ -152,7 +151,8 @@ def main():
             "notes": "spacy model: en_core_web_sm",
         },
     )
-    
+    """
+
 
 if __name__ == "__main__":
     main()

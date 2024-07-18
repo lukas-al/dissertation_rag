@@ -7,8 +7,9 @@ from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.docstore.document import Document
 from langchain.prompts.prompt import PromptTemplate
 from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
-from sentence_transformers import util
+from llama_cpp import Llama
 
+from sentence_transformers import util
 from StructuredRag.etl import embedding_funcs
 from StructuredRag.processing import graph_construction
 
@@ -24,6 +25,8 @@ class StructRAGInquirer:
         llm_name: str = "google/flan-t5-large",
         llm_max_tokens: int = 1024,
         use_anchor_document: bool = True,
+        llm_type: str = 'huggingface',
+        **kwargs,
     ):
         # Read the data for the specified experiment
         data = {}
@@ -37,14 +40,32 @@ class StructRAGInquirer:
         self.embedded_index = data["embedded_index"]
         self.edge_thresh = data["edge_thresh"]
         self.adj_matrix = data["adj_matrix"]
-        self.llm = HuggingFacePipeline.from_model_id(
-            model_id=llm_name,
-            task="text2text-generation",
-            model_kwargs={
-                "max_length": llm_max_tokens,
-            },
-        )
+        self.llm_type = llm_type
+        
+        if llm_type == 'huggingface':
+            self.llm = HuggingFacePipeline.from_model_id(
+                model_id=llm_name,
+                task="text2text-generation",
+                model_kwargs={
+                    "max_length": llm_max_tokens,
+                },
+            )
+        
+        elif llm_type == 'llamacpp':
+            try:
+                self.llm = Llama(
+                    model_path=kwargs.get('model_path'),
+                    verbose=kwargs.get('verbose', False),
+                    n_gpu_layers=kwargs.get('n_gpu_layers', -1),
+                    n_ctx=llm_max_tokens,
+                )
+            except ValueError as e:
+                raise ValueError(f"Error loading Llama model: {e} \n Double check to include required arguments")
+        
         self.use_anchor_document = use_anchor_document
+        self.graph = graph_construction.construct_graph_from_adj_dict(
+            self.adj_matrix, self.edge_thresh, self.embedded_index
+        )
 
     def run_inquirer(
         self,
@@ -64,27 +85,63 @@ class StructRAGInquirer:
         # Search through the graph to find the most similar nodes
         nearest_nodes = self._graph_similar_nodes(most_similar_node_id, k_context)
 
-        top_matches = self._reshape_documents_for_llm(nearest_nodes)
 
-        extractive_prompt, stuff_document_prompt = self._construct_prompt()
+        if self.llm_type == 'huggingface':
+            top_matches = self._reshape_documents_for_llm(nearest_nodes)            
+            extractive_prompt, stuff_document_prompt = self._construct_prompt()
 
-        # Query chain
-        query_chain = load_qa_with_sources_chain(
-            self.llm,
-            chain_type="stuff",
-            prompt=extractive_prompt,
-            document_prompt=stuff_document_prompt,
-        )
+            # Query chain
+            query_chain = load_qa_with_sources_chain(
+                self.llm,
+                chain_type="stuff",
+                prompt=extractive_prompt,
+                document_prompt=stuff_document_prompt,
+            )
 
-        # Response
-        response = query_chain.invoke(
-            {"input_documents": top_matches, "question": query},
-            return_only_outputs=True,
-        )
-        response["input_documents"] = top_matches
+            # Response
+            response = query_chain.invoke(
+                {"input_documents": top_matches, "question": query},
+                return_only_outputs=True,
+            )
+            response["input_documents"] = top_matches
 
-        return response
+            return response
 
+        elif self.llm_type == 'llamacpp':
+            context_string = self.build_context_for_QA_gen(
+                doc=self.embedded_index[most_similar_node_id],
+                k_context=k_context,
+            )
+
+            prompt = self.create_chatML_prompt(context_string, query)
+            
+            
+            response = self.llm.create_chat_completion(
+                messages = prompt
+            )
+            
+            return response
+
+    def create_chatML_prompt(context, query):
+        return [
+            {
+                "role": "system",
+                "content": """
+                    You are an AI assistant with a focus on helping to answer economists' search questions over particular documents. 
+                    Respond only to the question asked, the response should be concise and relevant, and use the context provided to give a comprehensive answer.
+                    It is important to maintain impartiality and non-partisanship. If you are unable to answer a question based on the given instructions and context, please indicate so.
+                    Your responses should be well-structured and professional, using British English.
+                """,
+            },
+            {
+                "role": "user",
+                "content": f"""
+                {query} Use the following context to answer the question:
+                Context: {context}
+                """,
+            },
+        ]
+    
     def get_document_name_list(self):
         doc_list = set()
         for doc in self.embedded_index:
@@ -121,12 +178,12 @@ class StructRAGInquirer:
         return most_similar_node_id, doc_similarity[most_similar_node_id]
 
     def _graph_similar_nodes(self, most_similar_node_id, k_context):
-        graph = graph_construction.construct_graph_from_adj_dict(
-            self.adj_matrix, self.edge_thresh, self.embedded_index
-        )
+        # graph = graph_construction.construct_graph_from_adj_dict(
+        #     self.adj_matrix, self.edge_thresh, self.embedded_index
+        # )
 
         node_paths = nx.single_source_dijkstra(
-            G=graph, source=most_similar_node_id, weight="weight"
+            G=self.graph, source=most_similar_node_id, weight="weight"
         )
 
         nearest_node_ids = list(node_paths[0].items())[:k_context]
@@ -231,6 +288,35 @@ class StructRAGInquirer:
         STUFF_DOCUMENT_PROMPT = PromptTemplate.from_template(_stuff_document_template)
         return EXTRACTIVE_PROMPT_PYDANTIC, STUFF_DOCUMENT_PROMPT
 
+    def build_context_for_QA_gen(self, doc, k_context: int = 3):
+        """
+        Builds the context string for generating synthetic question-answering pairs.
+
+        Args:
+            doc: The document for which the context is being built.
+            rag_agent: The RAG agent used for retrieving similar nodes.
+            k_context (int): The number of similar nodes to consider for building the context. Default is 3.
+
+        Returns:
+            context_string (str): The generated context string containing the clean text of similar nodes.
+        """
+        similar_nodes = self._graph_similar_nodes(doc.id_, k_context)
+        
+        context_string = """ """
+        for i, (node_id, _) in enumerate(similar_nodes):
+            # Yes its unoptimised... find the document who's id matches the node_id
+            node = next((x for x in self.embedded_index if x.id_ == node_id), None)
+            
+            clean_text = node.text.replace("\n", " ").replace("\t", " ").replace("  ", " ").strip()
+            context_string += f"Context {i}: {clean_text} \n"
+        
+        return context_string
+    
+
+class StructRAGInquirerLlamaCPP:
+    """Llama CPP version of the structRAG enquirer.
+    
+    """
 
 if __name__ == "__main__":
     inquirer = StructRAGInquirer(
