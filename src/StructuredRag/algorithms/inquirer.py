@@ -109,7 +109,7 @@ class StructRAGInquirer:
 
         elif self.llm_type == 'llamacpp':
             context_string = self.build_context_for_QA_gen(
-                doc=self.embedded_index[most_similar_node_id],
+                doc_id=most_similar_node_id,
                 k_context=k_context,
             )
 
@@ -122,7 +122,7 @@ class StructRAGInquirer:
             
             return response
 
-    def create_chatML_prompt(context, query):
+    def create_chatML_prompt(self, context, query):
         return [
             {
                 "role": "system",
@@ -178,9 +178,6 @@ class StructRAGInquirer:
         return most_similar_node_id, doc_similarity[most_similar_node_id]
 
     def _graph_similar_nodes(self, most_similar_node_id, k_context):
-        # graph = graph_construction.construct_graph_from_adj_dict(
-        #     self.adj_matrix, self.edge_thresh, self.embedded_index
-        # )
 
         node_paths = nx.single_source_dijkstra(
             G=self.graph, source=most_similar_node_id, weight="weight"
@@ -288,19 +285,19 @@ class StructRAGInquirer:
         STUFF_DOCUMENT_PROMPT = PromptTemplate.from_template(_stuff_document_template)
         return EXTRACTIVE_PROMPT_PYDANTIC, STUFF_DOCUMENT_PROMPT
 
-    def build_context_for_QA_gen(self, doc, k_context: int = 3):
+    def build_context_for_QA_gen(self, doc_id, k_context: int = 3):
         """
         Builds the context string for generating synthetic question-answering pairs.
 
         Args:
-            doc: The document for which the context is being built.
+            doc: The document for which the context is being built. Actual doc object
             rag_agent: The RAG agent used for retrieving similar nodes.
             k_context (int): The number of similar nodes to consider for building the context. Default is 3.
 
         Returns:
             context_string (str): The generated context string containing the clean text of similar nodes.
         """
-        similar_nodes = self._graph_similar_nodes(doc.id_, k_context)
+        similar_nodes = self._graph_similar_nodes(doc_id, k_context)
         
         context_string = """ """
         for i, (node_id, _) in enumerate(similar_nodes):
