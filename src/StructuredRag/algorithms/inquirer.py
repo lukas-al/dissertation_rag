@@ -53,11 +53,16 @@ class StructRAGInquirer:
         
         elif llm_type == 'llamacpp':
             try:
+                model_path = kwargs.pop('model_path', None)
+                verbose = kwargs.pop('verbose', False)
+                n_gpu_layers = kwargs.pop('n_gpu_layers', -1)
+
                 self.llm = Llama(
-                    model_path=kwargs.get('model_path'),
-                    verbose=kwargs.get('verbose', False),
-                    n_gpu_layers=kwargs.get('n_gpu_layers', -1),
+                    model_path=model_path,
+                    verbose=verbose,
+                    n_gpu_layers=n_gpu_layers,
                     n_ctx=llm_max_tokens,
+                    **kwargs  # Unpack additional keyword arguments
                 )
             except ValueError as e:
                 raise ValueError(f"Error loading Llama model: {e} \n Double check to include required arguments")
