@@ -16,6 +16,31 @@ import warnings
 class V4Retriever(AbstractRetriever):
     """
     V4 of the retrieval algorithm, scoring a BM25 similarity between the documents.
+
+    This class implements the V4 version of the retrieval algorithm. It calculates the similarity between documents
+    using the BM25 algorithm and retrieves the top k similar documents from the embedded index.
+
+    Attributes:
+        name (str): The name of the retriever.
+        version (str): The version of the retriever.
+        model (fastbm25.BM25): The BM25 model used for similarity calculation.
+
+    Methods:
+        __init__(self, name: str = "V4Retriever", version: str = "0.1", embedded_index=None):
+            Initializes the V4Retriever object.
+
+        retrieve_top_k_doc(self, doc1: Document, embedded_index: List[Document], k: int = 5, fuzzy_thresh: int = 80) -> List[Tuple[str, float]]:
+            Retrieves the top k documents from the embedded index based on their similarity scores.
+
+        calculate_distance(self, doc1: Document, doc2: Document) -> float:
+            Calculates the distance between two documents.
+
+        calc_sim_score(self, doc1, doc2):
+            Calculates the similarity score between two documents using the BM25 algorithm.
+
+        normalise_adj_dict(self, glbl_adj_dict):
+            Normalizes the adjacency dictionary.
+
     """
 
     # @Override

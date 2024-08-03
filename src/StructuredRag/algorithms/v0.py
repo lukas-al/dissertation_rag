@@ -1,7 +1,3 @@
-"""
-_summary_
-"""
-
 from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple
 from llama_index.core.schema import Document
@@ -11,8 +7,19 @@ from sentence_transformers import util
 
 class V0Retriever(AbstractRetriever):
     """
-    V0 of the retrieval algorithm, using a simple cosine similarity between embeddings
+    V0 of the retrieval algorithm, using a simple similarity between embeddings
     of the document's text.
+
+    This retriever calculates the similarity between a given document and a list of
+    documents using similarity scores. It retrieves the top k most similar documents
+    based on the calculated similarity scores.
+
+    Attributes:
+        None
+
+    Methods:
+        retrieve_top_k_doc: Retrieve the top k most similar documents to a given document.
+        calculate_distance: Calculate the distance between two documents using similarity.
     """
 
     # @Override
@@ -53,7 +60,7 @@ class V0Retriever(AbstractRetriever):
         doc2 (Document): The second document.
 
         Returns:
-        float: The similarity score between the two documents.
+        float: The similarity score between the two documents. Larger values indicate more similarity.
         """
         # For cosine_similarity
         # sim_score = cosine_similarity(

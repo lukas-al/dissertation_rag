@@ -191,7 +191,8 @@ class StructRAGInquirer:
             G=self.graph, source=most_similar_node_id, weight="weight"
         )
 
-        nearest_node_ids = list(node_paths[0].items())[:k_context]
+        # Get the nodes with the longest path - highest weight means most similar
+        nearest_node_ids = list(node_paths[0].items())[-k_context:]
 
         return nearest_node_ids
 

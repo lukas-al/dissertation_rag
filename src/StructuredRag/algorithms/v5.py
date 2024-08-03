@@ -24,6 +24,26 @@ from numpy import array
 class V5Retriever(AbstractRetriever):
     """
     V5 of the retrieval algorithm, doing named entity recognition, number matching, and link extraction.
+
+    This class implements the V5 version of the retrieval algorithm. It performs named entity recognition, number matching, 
+    and link extraction to retrieve similar documents from an embedded index. 
+    The algorithm calculates similarity scores based on the extracted named entities and links, 
+    and returns the top k documents with the highest similarity scores.
+
+    Attributes:
+        name (str): The name of the retriever.
+        version (str): The version of the retriever.
+        spacy_model: The Spacy NLP model used for named entity recognition.
+
+    Methods:
+        __init__: Initializes the V5Retriever object.
+        retrieve_top_k_doc: Retrieves the top k documents from the embedded index based on their similarity scores.
+        calculate_distance: Calculates the similarity score between two documents.
+        extract_named_entities: Extracts named entities from a document.
+        calculate_ner_distance: Calculates the similarity score between two lists of named entities.
+        calculate_link_similarity: Calculates the similarity score between two lists of links.
+        jaccard_sim: Calculates the Jaccard similarity between two sets.
+        scale_adj_matrix: Applies PCA weighting to a dictionary of weight vectors.
     """
 
     # @Override
@@ -31,7 +51,7 @@ class V5Retriever(AbstractRetriever):
         self,
         name: str = "V5Retriever",
         version: str = "0.1",
-        embedded_index=None,
+        # embedded_index=None,
         spacy_model=None,
     ):
         super().__init__(name, version)

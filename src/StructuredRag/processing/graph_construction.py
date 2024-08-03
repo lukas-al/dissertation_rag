@@ -282,13 +282,12 @@ def construct_graph_from_adj_dict(adj_dict, edge_thresh, embedded_index) -> nx.G
     Returns:
         nx.Graph: The constructed graph.
     """
-
     # Copy the adjacency dict
     adj_dict_local = adj_dict.copy()
 
     # Iterate over the adjacency dict to remove every edge which links a node to the same node
     for node0, edge_dict in adj_dict_local.items():
-        for node1, weight in list(edge_dict.items()):
+        for node1, _ in list(edge_dict.items()):
             # Remove matching nodes
             if node0 == node1:
                 del adj_dict_local[node0][node1]
@@ -305,7 +304,7 @@ def construct_graph_from_adj_dict(adj_dict, edge_thresh, embedded_index) -> nx.G
             date_num=int(pd.Timestamp(matching_doc.metadata["Date"]).timestamp()),
         )
 
-    # Add the edges
+    # Add the edges # MAKE SURE TO NEGATE THE WEIGHT SO THAT SHORTEST PATH ALGORITHMS WORK AS EXPECTED
     for node0, edge_bunch in tqdm(adj_dict.items(), desc="Adding edges to graph"):
         for node1, edge_weight in edge_bunch.items():
             if edge_weight["weight"] > edge_thresh:

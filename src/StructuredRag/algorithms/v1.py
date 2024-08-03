@@ -8,11 +8,20 @@ from typing import List, Tuple
 
 from ..processing.distance_metrics import calculate_distance_vector
 
-
 class V1Retriever(AbstractRetriever):
     """
     V1 of the retrieval algorithm, scoring a linear average of the embeddings and metadata distances.
-    The aggregation calculation could definitely be made more sophisticated...
+
+    This class implements the retrieval algorithm for retrieving similar documents from an embedded index.
+    It calculates the similarity scores between a given document and the documents in the embedded index
+    based on a linear average of the embeddings and metadata distances.
+
+    Attributes:
+        None
+
+    Methods:
+        retrieve_top_k_doc: Retrieve the top k documents from the embedded index based on their similarity scores.
+        calculate_distance: Calculate the distance between two documents using a weighted combination of embeddings and metadata.
     """
 
     # @Override
@@ -59,7 +68,7 @@ class V1Retriever(AbstractRetriever):
         - doc2 (Document): The second document.
 
         Returns:
-        - float: The calculated distance between the two documents.
+        - float: The calculated distance between the two documents. Higher is better.
         """
 
         distance_vector = calculate_distance_vector(

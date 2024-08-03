@@ -1,7 +1,3 @@
-"""
-v2 of the retrieval algorithm - let a neural network select the best combination of metrics
-"""
-
 from llama_index.core.schema import Document
 from .abstract_retriever import AbstractRetriever
 from typing import List, Tuple

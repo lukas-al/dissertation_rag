@@ -23,7 +23,7 @@ def node_name_distance(doc0, doc1) -> float:
         embed_model (EmbeddingModel): The embedding model used to calculate semantic similarity.
 
     Returns:
-        float: The distance between the names of the two documents.
+        float: The distance between the names of the two documents. Higher is better (max 1).
     """
     doc0_name = doc0.metadata["file_name"].split("/")[-1].split(".")[0]
     doc1_name = doc1.metadata["file_name"].split("/")[-1].split(".")[0]
@@ -59,7 +59,7 @@ def node_text_distance(doc0, doc1) -> float:
         doc2 (Document): the second document
 
     Returns:
-        float: the distance between the two nodes
+        float: the distance between the two nodes. Higher is better (max 1)
     """
 
     # Cosine sim models
@@ -76,7 +76,7 @@ def node_text_distance(doc0, doc1) -> float:
 
 
 def description_distance_metric(doc0, doc1):
-    """Use the cosine distance between the description embeddings to
+    """Use the  distance between the description embeddings to
     calculate the distance between the two documents
 
     Args:
@@ -84,7 +84,7 @@ def description_distance_metric(doc0, doc1):
         doc1 (_type_): _description_
 
     Returns:
-        _type_: _description_
+        _type_: Higher is better. Max 1.
     """
     # doc0_desc = doc0.metadata["Description"]
     # doc1_desc = doc1.metadata["Description"]
@@ -117,7 +117,7 @@ def doctype_distance_metric(doc0, doc1):
     - doc1 (Document): The second document.
 
     Returns:
-    - float: The distance metric between the document types. The value is scaled between -1 and 1.
+    - float: The distance metric between the document types. The value is scaled between -1 and 1. Higher is better. Max 1.
 
     Raises:
     - ValueError: If the document types are not found in the knowledge graph.
@@ -171,7 +171,7 @@ def scaled_date_difference(doc0, doc1):
     date1 (str or datetime): The date to compare with the base date.
 
     Returns:
-    float: The scaled difference between the two dates.
+    float: The scaled difference between the two dates. Higher is better. Max 1.
 
     """
     # Try to convert the dates to datetime objects
@@ -209,7 +209,7 @@ def author_distance_metric(doc0, doc1, fuzz_thresh=80) -> float:
     - fuzz_thresh (int): The threshold for fuzzy matching similarity. Default is 80.
 
     Returns:
-    - float: The scaled similarity between the authors of the two documents.
+    - float: The scaled similarity between the authors of the two documents. Higher is better.
 
     """
     authors0 = doc0.metadata["Authors"]
@@ -245,7 +245,7 @@ def fuzzy_jaccard_similarity(set1, set2, threshold):
     threshold (int): The minimum similarity threshold for a match.
 
     Returns:
-    float: The fuzzy Jaccard similarity between the two sets.
+    float: The fuzzy Jaccard similarity between the two sets. Higher is better.
     """
     # Deal with the case where either one of the inputs are single item strings
     if isinstance(set1, str) | isinstance(set2, str):
@@ -287,7 +287,7 @@ def topic_distance_metric(doc0, doc1, fuzz_thresh=80):
         fuzz_thresh (int, optional): The threshold for fuzzy matching. Defaults to 80.
 
     Returns:
-        float: The scaled similarity between the topics of the two documents.
+        float: The scaled similarity between the topics of the two documents. Higher is better.
     """
 
     # Get the topics from the metadata
@@ -352,7 +352,7 @@ def division_distance_metric(doc0, doc1, fuzz_thresh=80):
     - fuzz_thresh: The threshold for fuzzy matching similarity. Default is 80.
 
     Returns:
-    - The scaled similarity between the divisions of the two documents, ranging from -1 to 1.
+    - The scaled similarity between the divisions of the two documents, ranging from -1 to 1. Higher is better.
     """
     # Get the divisions from the metadata
     divisions0 = [
@@ -384,7 +384,7 @@ def mpc_round_distance_metric(doc0, doc1) -> int:
 
     Returns:
     int: The distance metric between the two documents.
-        Returns 1 if the MPC Round metadata is the same, -1 otherwise.
+        Returns 1 if the MPC Round metadata is the same, -1 otherwise. Higher is better.
     """
 
     # Get the MPC round from the metadata
@@ -410,7 +410,7 @@ def forecast_round_distance_metric(doc0, doc1) -> float:
 
     Returns:
     - int: The distance metric between the two documents.
-        Returns 1 if the forecast round is the same, -1 otherwise.
+        Returns 1 if the forecast round is the same, -1 otherwise. Higher is better.
     """
     # Get the forecast round from the metadata
     forecast_round0 = doc0.metadata["Forecast Round"]
@@ -437,7 +437,7 @@ def calculate_distance_vector(doc0, doc1, fuzz_thresh=80):
 
     Returns:
         List[float]: The distance vector between the two documents
-                    All scores are normalised between -1 and 1.
+                    All scores are normalised between -1 and 1. Higher is better.
     """
     name_distance = node_name_distance(doc0, doc1)
     text_distance = node_text_distance(doc0, doc1)

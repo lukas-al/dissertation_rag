@@ -1,7 +1,3 @@
-"""
-V3 of the retrieval algorithm - using a PCA to reduce the dimensionality of the metadata vector
-"""
-
 from llama_index.core.schema import Document
 from .abstract_retriever import AbstractRetriever
 from sklearn.decomposition import PCA
@@ -9,11 +5,21 @@ import warnings
 
 from ..processing.distance_metrics import calculate_distance_vector
 
-
 class V3Retriever(AbstractRetriever):
     """
-    V1 of the retrieval algorithm, scoring a linear average of the embeddings and metadata distances.
-    The aggregation calculation could definitely be made more sophisticated...
+    V3 of the retrieval algorithm - using a PCA to reduce the dimensionality of the metadata vector
+
+    This class implements the V3 version of the retrieval algorithm. It uses a PCA (Principal Component Analysis) to reduce the dimensionality of the metadata vector. The algorithm retrieves similar documents based on their similarity scores.
+
+    Attributes:
+        name (str): The name of the retriever.
+        version (str): The version of the retriever.
+        embed_model: The embedding model used for calculating distances.
+
+    Methods:
+        __init__(self, name: str = "default", version: str = "0", embed_model=None): Initializes the V3Retriever object.
+        calculate_distance(self, doc1: Document, doc2: Document) -> float: Calculates the distance between two documents using a weighted combination of embeddings and metadata.
+        pca_vector_dict(self, vector_dict): Applies PCA weighting to a dictionary of vectors.
     """
 
     # @Override
