@@ -228,7 +228,7 @@ if __name__ == "__main__":
     raw_outputs = []
     outputs = []
     for sample_doc in tqdm(
-        random.sample(embedded_index, 5), desc="Generating QA pairs"
+        random.sample(embedded_index, 10), desc="Generating QA pairs"
     ):
         context_text = build_context_for_QA_gen(sample_doc, inquirer, k_context=3)
         try:
@@ -357,12 +357,14 @@ if __name__ == "__main__":
     ) as f:
         json.dump(outputs, f, indent=4)
 
-    # Filter out any bad outputs using the scores - simple lambda
+    # Filter out any bad outputs using the scores - simple lambda with gets to avoid KeyError
     filtered_outputs = list(
         filter(
-            lambda x: float(x["groundedness_score"]) >= 2
-            and float(x["relevance_score"]) >= 2
-            and float(x["standalone_score"]) >= 2,
+            lambda x: (
+                float(x.get("groundedness_score", 0)) >= 2
+                and float(x.get("relevance_score", 0)) >= 2
+                and float(x.get("standalone_score", 0)) >= 2
+            ),
             outputs,
         )
     )
@@ -415,18 +417,31 @@ if __name__ == "__main__":
     judge_prompt = conv.get_prompt()
 
     for qa_bundle in tqdm(filtered_outputs, desc="Running judgement llm"):
-        evaluation = judge_llm.create_completion(
-            prompt=judge_prompt.format(
-                query=qa_bundle["question"],
-                context=qa_bundle["context"],
-                reference_answer=qa_bundle["answer"],
-                answer_RAG_system=qa_bundle["RAG_response"]["choices"][0]["message"][
-                    "content"
-                ],
-            ),
-            echo=True,
-            max_tokens=None,
-        )
+        try:
+            evaluation = judge_llm.create_completion(
+                prompt=judge_prompt.format(
+                    query=qa_bundle["question"],
+                    context=qa_bundle["context"],
+                    reference_answer=qa_bundle["answer"],
+                    answer_RAG_system=qa_bundle["RAG_response"]["choices"][0]["message"][
+                        "content"
+                    ],
+                ),
+                echo=True,
+                max_tokens=None,
+            )
+        except ValueError as e:
+            if "exceed context window" in str(e):
+                print(
+                    f"Skipping sample document {sample_doc.id_} as it exceeds the token context window. \n Error: {e}"
+                )
+                qa_bundle.update(
+                    {
+                        "judge_evaluation": {"choices": [{"text": "0"}]},
+                        "judge_score": "0",
+                    }
+                )
+                continue
 
         qa_bundle.update(
             {

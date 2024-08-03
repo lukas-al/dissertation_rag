@@ -31,10 +31,13 @@ class StructRAGInquirer:
         # Read the data for the specified experiment
         data = {}
         for item in os.listdir(path_to_experiment):
-            print("Loading item:", item.split(".")[0])
 
-            with open(path_to_experiment + "/" + item, "rb") as f:
-                data[item.split(".")[0]] = pickle.load(f)
+            # If item is a pickle
+            if item.split(".")[-1] == "pickle":
+                print("Loading item:", item.split(".")[0])
+
+                with open(path_to_experiment + "/" + item, "rb") as f:
+                    data[item.split(".")[0]] = pickle.load(f)
 
         # Instantiate the class variables and llm
         self.embedded_index = data["embedded_index"]
