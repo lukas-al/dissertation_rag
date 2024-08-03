@@ -219,7 +219,7 @@ def load_documents(num_files_limit=None, chunk_size: int = 256) -> List[BaseNode
         path_to_docs, file_metadata=get_metadata, num_files_limit=num_files_limit
     ).load_data()
 
-    # ! TODO: CHECK IF THIS WORKS OR NOT
+    
     # Split the documents into appropriately sized nodes
     node_list = TokenTextSplitter(
         separator=" ",

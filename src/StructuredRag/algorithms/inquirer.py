@@ -31,10 +31,13 @@ class StructRAGInquirer:
         # Read the data for the specified experiment
         data = {}
         for item in os.listdir(path_to_experiment):
-            print("Loading item:", item.split(".")[0])
 
-            with open(path_to_experiment + "/" + item, "rb") as f:
-                data[item.split(".")[0]] = pickle.load(f)
+            # If item is a pickle
+            if item.split(".")[-1] == "pickle":
+                print("Loading item:", item.split(".")[0])
+
+                with open(path_to_experiment + "/" + item, "rb") as f:
+                    data[item.split(".")[0]] = pickle.load(f)
 
         # Instantiate the class variables and llm
         self.embedded_index = data["embedded_index"]
@@ -53,11 +56,16 @@ class StructRAGInquirer:
         
         elif llm_type == 'llamacpp':
             try:
+                model_path = kwargs.pop('model_path', None)
+                verbose = kwargs.pop('verbose', False)
+                n_gpu_layers = kwargs.pop('n_gpu_layers', -1)
+
                 self.llm = Llama(
-                    model_path=kwargs.get('model_path'),
-                    verbose=kwargs.get('verbose', False),
-                    n_gpu_layers=kwargs.get('n_gpu_layers', -1),
+                    model_path=model_path,
+                    verbose=verbose,
+                    n_gpu_layers=n_gpu_layers,
                     n_ctx=llm_max_tokens,
+                    **kwargs  # Unpack additional keyword arguments
                 )
             except ValueError as e:
                 raise ValueError(f"Error loading Llama model: {e} \n Double check to include required arguments")

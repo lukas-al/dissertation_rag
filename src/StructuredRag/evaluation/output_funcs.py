@@ -202,8 +202,8 @@ def create_human_eval_spreadsheet(
     for gp, results in total_results_holder.items():
         df = format_results(test_cases, anchor_doc_flag, results)
 
-        with pd.ExcelWriter(project_root + "\\evaluation" + f'\\{wb_name}') as writer:
-            gp_name = gp.replace("\\", '-')[-1]
+        with pd.ExcelWriter(project_root + "\\evaluation" + f"\\{wb_name}") as writer:
+            gp_name = gp.replace("\\", "-")[-1]
             df.to_excel(writer, sheet_name=f"human_eval_{gp_name}")
 
         df_holder.append(df)
@@ -217,9 +217,9 @@ if __name__ == "__main__":
         anchor_doc_flag=False,
         graph_paths=[
             "\\v0\\2024-06-15",
-            '\\v1\\2024-06-16',
-            '\\v3\\2024-05-28',
-            '\\v4\\2024-05-28',
-            '\\v5\\2024-05-19'
+            "\\v1\\2024-06-16",
+            "\\v3\\2024-05-28",
+            "\\v4\\2024-05-28",
+            "\\v5\\2024-05-19",
         ],
     )
