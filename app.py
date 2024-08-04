@@ -11,11 +11,6 @@ from datetime import datetime
 #! TODO: 
 #! Testing
 #! 1. Add some needle in haystack queries
-#! 
-#! Improve performance
-#! 2. Replace FLAN with a quantised model for the AG
-#! 3. Replace multiQA with a better embedding model - reduce dataset size if necessary !DONE - REPLACED IT WITH BGE LARGE
-#! 4. Pre-clean some of the text \n and random stuff, clean out stuff which is lots of numbers (if > 50% non alpha chars remove) !DONE - CLEANED OUT \n 
 
 def main():
     """
