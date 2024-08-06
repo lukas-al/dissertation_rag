@@ -6,7 +6,9 @@ import json
 import pickle
 import pathlib
 import random
+import cleantext
 from llama_cpp import Llama
+
 
 from StructuredRag.utils import mistral_conversation
 from StructuredRag.algorithms.inquirer import StructRAGInquirer
@@ -14,16 +16,28 @@ from StructuredRag.algorithms.inquirer import StructRAGInquirer
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent.parent.parent
 
 # Shortened and fitting into the CHATML format
+# QA_SYSTEM_PROMPT = """ 
+# Your task is to write a factoid question and an answer given a context.
+# Your factoid question should be answerable with a specific, concise piece of factual information from the context.
+
+# Provide your answer as follows:
+
+# Output:::
+# Factoid question: (your factoid question)
+# Answer: (your answer to the factoid question)
+# """
+
 QA_SYSTEM_PROMPT = """ 
-Your task is to write a factoid question and an answer given a context.
-Your factoid question should be answerable with a specific, concise piece of factual information from the context.
+Your task is to write a meaningful question and an answer given a context.
+Your question should be answerable using information which is present in the context. It should be both open-ended and ask for specific, concise information from the context.
 
 Provide your answer as follows:
 
 Output:::
-Factoid question: (your factoid question)
-Answer: (your answer to the factoid question)
+Question: (your question)
+Answer: (your answer to the question)
 """
+
 
 QA_GROUNDEDNESS_PROMPT = """
 Your task is to provide a 'total rating' scoring how well one can answer the given question unambiguously with the given context.
@@ -129,6 +143,9 @@ def build_context_for_QA_gen(doc, rag_agent, k_context: int = 3):
         clean_text = (
             node.text.replace("\n", " ").replace("\t", " ").replace("  ", " ").strip()
         )
+
+        clean_text = cleantext.clean(clean_text)
+
         context_string += f"Context item {i}: {clean_text} \n"
 
     return context_string
@@ -198,7 +215,7 @@ def create_chatML_quality_prompt(
 
 
 if __name__ == "__main__":
-    experiment_path = "v5/2024-07-20"
+    experiment_path = "v0/2024-07-20"
     mistral_model_path = pathlib.Path(
         r"C:\Users\335257\.cache\huggingface\hub\models--TheBloke--CapybaraHermes-2.5-Mistral-7B-GGUF\snapshots\234067be357852d0c75bf1d04d2c720d15eab3e2\capybarahermes-2.5-mistral-7b.Q5_0.gguf"
     )
