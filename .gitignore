@@ -2,6 +2,7 @@
 *.pdf
 *.duckdb
 results/
+*.html
 
 # Data organisation
 *.xlsx

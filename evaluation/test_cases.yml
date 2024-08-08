@@ -94,3 +94,12 @@ test_cases:
   
   - question: "What is the medium term outlook"
     anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What analysis has been done on the effect of the housing market on inflation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+
+  - question: "What analysis has been done on the effect of the labour market on inflation?"
+    anchor_document: "monetary policy report february 2024.pdf"
+  
+  - question: "What analysis has been done on the effect of the global economy on inflation?"
+    anchor_document: "monetary policy report february 2024.pdf"
