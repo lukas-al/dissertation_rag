@@ -47,17 +47,19 @@ class V3Retriever(AbstractRetriever):
             doc2,
         )
 
+        # A bit kludgey - similar to the cloudstrike OOB error on the channel file :)
         sim_score = (
             distance_vector[0] * 0.05 + # Name distance
             distance_vector[1] * 0.3 + # Text distance
             distance_vector[2] * 0.1 + # Description distance
-            distance_vector[3] * 0.1 + # Author distance
-            distance_vector[4] * 0.1 + # Topic distance
-            distance_vector[5] * 0.05 + # Brand distance
-            distance_vector[6] * 0.1 + # Division distance
-            distance_vector[7] * 0.05 + # MPC round distance
-            distance_vector[8] * 0.05 + # Forecast round distance
-            distance_vector[9] * 0.1   # Date distance
+            distance_vector[3] * 0.05 + # Type distance
+            distance_vector[4] * 0.1 + # Author distance
+            distance_vector[5] * 0.1 + # Topic distance
+            distance_vector[6] * 0.05 + # Brand distance
+            distance_vector[7] * 0.05 + # Division distance
+            distance_vector[8] * 0.05 + # MPC round distance
+            distance_vector[9] * 0.05 + # Forecast round distance
+            distance_vector[10] * 0.1   # Date distance
         ) / len(distance_vector)
 
         return sim_score

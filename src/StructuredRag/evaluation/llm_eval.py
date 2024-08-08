@@ -216,7 +216,7 @@ def create_chatML_quality_prompt(
 
 
 if __name__ == "__main__":
-    experiment_path = "v0/2024-08-06"
+    experiment_path = "v3/2024-08-07"
     mistral_model_path = pathlib.Path(
         r"C:\Users\335257\.cache\huggingface\hub\models--TheBloke--CapybaraHermes-2.5-Mistral-7B-GGUF\snapshots\234067be357852d0c75bf1d04d2c720d15eab3e2\capybarahermes-2.5-mistral-7b.Q5_0.gguf"
     )
@@ -230,6 +230,7 @@ if __name__ == "__main__":
     ) as f:
         embedded_index = pickle.load(f)
 
+    
     inquirer = StructRAGInquirer(
         path_to_experiment=str(PROJECT_ROOT / "results" / experiment_path),
         llm_type="llamacpp",
@@ -416,14 +417,14 @@ if __name__ == "__main__":
     ) as f:
         json.dump(filtered_outputs, f, indent=4)
 
-
+    
     ### LOAD FOR PERSISTENCE -> READ FROM FILE
     with open(PROJECT_ROOT / "results" / experiment_path / "qa_pairs_answered.json", "r") as f:
         filtered_outputs = json.load(f)
     
     ### FINAL EVALUATION USING JUDGE LLM
     judge_llm = Llama(
-        model_path=str(prometheus_model_path), verbose=False, n_gpu_layers=0, n_ctx=1600, n_threads=4,
+        model_path=str(prometheus_model_path), verbose=False, n_gpu_layers=0, n_ctx=1750, n_threads=4,
     )
 
     conv = mistral_conversation.get_conv_template("mistral")
