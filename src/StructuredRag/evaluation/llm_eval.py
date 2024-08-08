@@ -29,7 +29,8 @@ PROJECT_ROOT = pathlib.Path(__file__).parent.parent.parent.parent
 
 QA_SYSTEM_PROMPT = """ 
 Your task is to write a meaningful question and an answer given a context.
-Your question should be answerable using information which is present in the context. It should be both open-ended and ask for specific, concise information from the context.
+Your question should be answerable using information which is present in the context. It should be both open-ended and also ask for specific, concise information from the context.
+The question should be useful to a macroeconomist working at the Bank of England.
 
 Provide your answer as follows:
 
@@ -215,15 +216,15 @@ def create_chatML_quality_prompt(
 
 
 if __name__ == "__main__":
-    experiment_path = "v0/2024-07-20"
+    experiment_path = "v0/2024-08-06"
     mistral_model_path = pathlib.Path(
         r"C:\Users\335257\.cache\huggingface\hub\models--TheBloke--CapybaraHermes-2.5-Mistral-7B-GGUF\snapshots\234067be357852d0c75bf1d04d2c720d15eab3e2\capybarahermes-2.5-mistral-7b.Q5_0.gguf"
     )
     prometheus_model_path = pathlib.Path(
         r"C:\Users\335257\.cache\huggingface\hub\models--vsevolodl--prometheus-7b-v2.0-GGUF\snapshots\b0c3627c40a9ab93c358a110702d8e3a6b20e5d7\prometheus-7b-v2.0.Q5_K_M.gguf"
     )
+    N_QA_PAIRS = 10
     
-
     with open(
         PROJECT_ROOT / "results" / experiment_path / "embedded_index.pickle", "rb"
     ) as f:
@@ -245,7 +246,7 @@ if __name__ == "__main__":
     raw_outputs = []
     outputs = []
     for sample_doc in tqdm(
-        random.sample(embedded_index, 10), desc="Generating QA pairs"
+        random.sample(embedded_index, N_QA_PAIRS), desc="Generating QA pairs"
     ):
         context_text = build_context_for_QA_gen(sample_doc, inquirer, k_context=3)
         try:
@@ -265,7 +266,7 @@ if __name__ == "__main__":
                 {
                     "context": context_text,
                     "question": output["choices"][0]["message"]["content"]
-                    .split("Factoid question: ")[1]
+                    .split("Question: ")[1]
                     .split("\n")[0],
                     "answer": output["choices"][0]["message"]["content"].split(
                         "Answer: "

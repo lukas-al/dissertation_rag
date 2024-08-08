@@ -428,6 +428,18 @@ def forecast_round_distance_metric(doc0, doc1) -> float:
 def calculate_distance_vector(doc0, doc1, fuzz_thresh=80):
     """
     Calculate the distance vector between two documents using a combination of semantic and syntactic similarity measures.
+    List contains the following metrics in order:
+    - Name distance
+    - Text distance
+    - Description distance
+    - Type distance
+    - Author distance
+    - Topic distance
+    - Brand distance
+    - Division distance
+    - MPC Round distance
+    - Forecast Round distance
+    - Date distance
 
     Args:
         doc0 (Document): The first document.
