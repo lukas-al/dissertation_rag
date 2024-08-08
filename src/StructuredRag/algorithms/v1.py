@@ -8,6 +8,7 @@ from typing import List, Tuple
 
 from ..processing.distance_metrics import calculate_distance_vector
 
+
 class V1Retriever(AbstractRetriever):
     """
     V1 of the retrieval algorithm, scoring a linear average of the embeddings and metadata distances.
