@@ -22,6 +22,7 @@ src/StructuredRag/etl/embedding_funcs.py
 src/StructuredRag/etl/etl_funcs.py
 src/StructuredRag/evaluation/__init__.py
 src/StructuredRag/evaluation/graph_scoring.py
+src/StructuredRag/evaluation/llm_eval.py
 src/StructuredRag/evaluation/output_funcs.py
 src/StructuredRag/processing/__init__.py
 src/StructuredRag/processing/distance_metrics.py
@@ -29,4 +30,5 @@ src/StructuredRag/processing/graph_construction.py
 src/StructuredRag/processing/param_tuning.py
 src/StructuredRag/utils/__init__.py
 src/StructuredRag/utils/custom_TokenTextSplitter.py
+src/StructuredRag/utils/mistral_conversation.py
 src/StructuredRag/utils/persist_results.py

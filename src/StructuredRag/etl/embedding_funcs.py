@@ -1,6 +1,7 @@
 """
 Module containing the embedding functions for the ETL pipeline and other activities.
 """
+import cleantext
 
 from typing import List
 from llama_index.core.schema import Document
@@ -35,6 +36,7 @@ def embed_index(document_index: List[Document]) -> List[Document]:
 
             # Replace newlines with spaces to clean the text a little, make embedding a little easier
             doc.text = doc.text.replace("\n", " ")
+            doc.text = cleantext.clean(doc.text)
 
             # Embed the document text
             doc.embedding = model.encode(doc.text, normalize_embeddings=True).tolist()
