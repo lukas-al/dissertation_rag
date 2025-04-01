@@ -1,8 +1,11 @@
 # structured_rag
-Try and fix the knowledge management issues within MA and the Bank of England.
+Dissertation project, MSc Data Science 2024.
 
+This version in Github is out of date and in cold storage. The code has since moved to the internal repo.
 
-# Narrative to construct
+---
+
+## Narrative to construct
 
 ### Having:
 1. Tested numerous embedding models
